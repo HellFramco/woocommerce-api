@@ -7,8 +7,9 @@ require_once( 'lib/woocommerce-api.php' );
 // Usar los parametros de la API de Woocommerce
 use Automattic\WooCommerce\Client;
 
-class APIMetodos{
+class APIMetodos{ //Creando clase de metodos
 
+    // Funcion para traer la data del Stock de todos los productos de Woocommerce
     public function getStockToWoocommerceDB(){
 
         // Iniciando variables de autenticacion
@@ -89,7 +90,7 @@ class APIMetodos{
             }
         }
     }
-
+    // Funcion para crear o exportar productos de la base de datos de Woocommerce
     public function exportStockToWoocommerceDB(){
 
          // Iniciando variables de autenticacion
@@ -132,7 +133,7 @@ class APIMetodos{
             }
         }
     }
-
+    // Funcion para eliminar productos de la base de datos de Woocommerce
     public function deleteStockToWoocommerceDB(){
 
         // Iniciando variables de autenticacion
@@ -175,7 +176,7 @@ class APIMetodos{
             }
         }
     }
-
+    // Funcion para actualizar productos de la base de datos de Woocommerce
     public function updateStockToWoocommerceDB(){
 
         // Iniciando variables de autenticacion
@@ -223,7 +224,5 @@ class APIMetodos{
 
 $a = new APIMetodos();
 $a->deleteStockToWoocommerceDB();
-
-
 
 ?>
