@@ -1,10 +1,13 @@
 <?php
 
+// Cargue de librerias
 require __DIR__ . '/vendor/autoload.php';
 require_once( 'lib/woocommerce-api.php' );
 
+// Usar los parametros de la API de Woocommerce
 use Automattic\WooCommerce\Client;
 
+// Iniciando variables de autenticacion
 $options = array(
 	'debug'           => true,
 	'return_as_array' => false,
@@ -15,6 +18,7 @@ $options = array(
 
 try {
 
+    // Autenticando 
 	$client = new WC_API_Client(
     'https://www.drabbalovers.co/',
     'ck_3e6abf70b8566f628bd50ffc70dd38779caefb00',
