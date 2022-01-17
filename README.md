@@ -10,9 +10,11 @@ Se agradecen los comentarios y los informes de errores.
 
 ## Requisitos
 
-PHP 5.2.x 
-cURL WooCommerce 2.2 al menos en la tienda
-Composer
+PHP 5.2.x.
+
+cURL WooCommerce 2.2 al menos en la tienda.
+
+Composer.
 
 ## Empezando
 
@@ -23,16 +25,14 @@ Inicie una configuracion de proyecto con composer
 composer init
 ```
 
-Clone el repositorio a una carpeta en su maquina local.
+Clone el repositorio a la carpeta de su proyecto en su maquina local.
 
 Luego instal el paquete de dependencia 
 ```git
 composer require automattic/woocommerce
 ```
 
-
-## Setup the library
-
+## Configurar la biblioteca
 ```php
 require_once( 'lib/woocommerce-api.php' );
 
@@ -89,7 +89,7 @@ Exceptions are thrown when errors are encountered, most will be instances of `WC
 
 ## Credit
 
-Copyright (c) 2013-2014 - [Gerhard Potgieter](http://gerhardpotgieter.com/), [Max Rice](http://maxrice.com) and other contributors
+Copyright (c) 2021 - ["HellFramco"](http://www.mb-developer.ml/), [Manuel Barrios](http://www.mb-developer.ml/) and other contributors
 
 ## License
 Released under the [GPL3 license](http://www.gnu.org/licenses/gpl-3.0.html)
