@@ -1,27 +1,16 @@
 ## Changelog
 
-**version 2.0.1 - 2015-07-13**
-- Fix composer configuration
+**version 0.1 - 2021-16-01**
 
-**version 2.0.0 - 2015-05-05**
-- Add support for v2 API (v1 is no longer supported)
-- Greatly improved error handling and logging
-- Add store URL validation
-
-**version 0.3.1 - 2014-05-02**
-
-- Fix parameter normalization issue with WC 2.1.7+
-
-**version 0.3 - 2014-02-20**
-
-- Add HTTP error messages on failed cURL calls
-
-**version 0.2 - 2014-01-22**
-
+- Initial release
 - Add support for filters/params to endpoint functions
 - Add new top sellers report endpoint function
 - Add function to call custom endpoints
-
-**version 0.1 - 2013-12-10**
-
-- Initial release
+- Add HTTP error messages on failed cURL calls
+- Fix parameter normalization issue with WC 2.1.7+
+- Add support for v2 API (v1 is no longer supported)
+- Greatly improved error handling and logging
+- Add store URL validation
+- Fix composer configuration
+- Library "WooCommerce-REST-API-Client-Library" = Author = maxrice LinkGitHub = https://github.com/kloon/WooCommerce-REST-API-Client-Library
+- Added data treatment methods
