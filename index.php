@@ -92,12 +92,137 @@ class APIMetodos{
 
     public function exportStockToWoocommerceDB(){
 
+         // Iniciando variables de autenticacion
+        $options = array(
+            'debug'           => true,
+            'return_as_array' => false,
+            'validate_url'    => false,
+            'timeout'         => 30,
+            'ssl_verify'      => false,
+        );
+
+        try {
+
+            // Autenticando 
+            $client = new WC_API_Client(
+            'https://www.drabbalovers.co/',
+            'ck_3e6abf70b8566f628bd50ffc70dd38779caefb00',
+            'cs_2a4c74eb3f5ee2e70f57a47d540c9d28c3f19c70',
+            $options );
+
+            $woocommerce = new Client(
+            'https://www.drabbalovers.co/', 
+            'ck_3e6abf70b8566f628bd50ffc70dd38779caefb00', 
+            'cs_2a4c74eb3f5ee2e70f57a47d540c9d28c3f19c70',
+            [
+                'version' => 'wc/v3',
+            ]);
+
+            $client->products->create( array( 'title' => 'Test Product','sku' => '00010', 'type' => 'simple', 'regular_price' => '9.99', 'description' => 'test' ) );
+
+        }catch ( WC_API_Client_Exception $e ) {
+
+            echo $e->getMessage() . PHP_EOL;
+            echo $e->getCode() . PHP_EOL;
+            
+            if ( $e instanceof WC_API_Client_HTTP_Exception ) {
+            
+                print_r( $e->get_request() );
+                print_r( $e->get_response() );
+            }
+        }
+    }
+
+    public function deleteStockToWoocommerceDB(){
+
+        // Iniciando variables de autenticacion
+        $options = array(
+            'debug'           => true,
+            'return_as_array' => false,
+            'validate_url'    => false,
+            'timeout'         => 30,
+            'ssl_verify'      => false,
+        );
+
+        try {
+
+           // Autenticando 
+            $client = new WC_API_Client(
+            'https://www.drabbalovers.co/',
+            'ck_3e6abf70b8566f628bd50ffc70dd38779caefb00',
+            'cs_2a4c74eb3f5ee2e70f57a47d540c9d28c3f19c70',
+            $options );
+
+            $woocommerce = new Client(
+            'https://www.drabbalovers.co/', 
+            'ck_3e6abf70b8566f628bd50ffc70dd38779caefb00', 
+            'cs_2a4c74eb3f5ee2e70f57a47d540c9d28c3f19c70',
+            [
+                'version' => 'wc/v3',
+            ]);
+
+            $client->products->delete( '2345', true );
+
+        }catch ( WC_API_Client_Exception $e ) {
+
+            echo $e->getMessage() . PHP_EOL;
+            echo $e->getCode() . PHP_EOL;
+
+            if ( $e instanceof WC_API_Client_HTTP_Exception ) {
+
+                print_r( $e->get_request() );
+                print_r( $e->get_response() );
+            }
+        }
+    }
+
+    public function updateStockToWoocommerceDB(){
+
+        // Iniciando variables de autenticacion
+        $options = array(
+        'debug'           => true,
+        'return_as_array' => false,
+        'validate_url'    => false,
+        'timeout'         => 30,
+        'ssl_verify'      => false,
+        );
+
+        try {
+
+        // Autenticando 
+        $client = new WC_API_Client(
+        'https://www.drabbalovers.co/',
+        'ck_3e6abf70b8566f628bd50ffc70dd38779caefb00',
+        'cs_2a4c74eb3f5ee2e70f57a47d540c9d28c3f19c70',
+        $options );
+
+        $woocommerce = new Client(
+        'https://www.drabbalovers.co/', 
+        'ck_3e6abf70b8566f628bd50ffc70dd38779caefb00', 
+        'cs_2a4c74eb3f5ee2e70f57a47d540c9d28c3f19c70',
+        [
+            'version' => 'wc/v3',
+        ]);
+
+        $client->products->update( '2333', array( 'title' => 'hermoso' ) );
+
+        }catch ( WC_API_Client_Exception $e ) {
+
+        echo $e->getMessage() . PHP_EOL;
+        echo $e->getCode() . PHP_EOL;
+        
+        if ( $e instanceof WC_API_Client_HTTP_Exception ) {
+        
+            print_r( $e->get_request() );
+            print_r( $e->get_response() );
+        }
+        }
     }
 
 }
 
 $a = new APIMetodos();
-$a->getStockToWoocommerceDB();
+$a->deleteStockToWoocommerceDB();
 
 
 
