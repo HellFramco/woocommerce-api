@@ -223,6 +223,6 @@ class APIMetodos{ //Creando clase de metodos
 }
 
 $a = new APIMetodos();
-$a->deleteStockToWoocommerceDB();
+$a->getStockToWoocommerceDB();
 
 ?>
