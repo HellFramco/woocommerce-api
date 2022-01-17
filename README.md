@@ -1,21 +1,35 @@
-WooCommerce REST API PHP Client Library
+Biblioteca de cliente PHP de la API REST de WooCommerce REMASTERIZADA
 =======================================
 
-## About
+## Acerca de
 
-A PHP wrapper for the WooCommerce REST API. Easily interact with the WooCommerce REST API using this library.
+Un contenedor de PHP para la API REST de WooCommerce.
+Interactúe fácilmente con la API REST de WooCommerce usando esta biblioteca.
 
-Feedback and bug reports are appreciated.
+Se agradecen los comentarios y los informes de errores.
 
-## Requirements
+## Requisitos
 
-PHP 5.2.x
-cURL
-WooCommerce 2.2 at least on the store
+PHP 5.2.x 
+cURL WooCommerce 2.2 al menos en la tienda
+Composer
 
-## Getting started
+## Empezando
 
-Generate API credentials (Consumer Key & Consumer Secret) under WP Admin > Your Profile.
+Genere credenciales de API (Clave de consumidor y Secreto de consumidor) en WP Admin > Su perfil.
+
+Inicie una configuracion de proyecto con composer
+```git
+composer init
+```
+
+Clone el repositorio a una carpeta en su maquina local.
+
+Luego instal el paquete de dependencia 
+```git
+composer require automattic/woocommerce
+```
+
 
 ## Setup the library
 
