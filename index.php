@@ -384,7 +384,6 @@ class APIMetodos{ //Creando clase de metodos
                 $stockPDB = (int) $primaryDBArray[$qq][2];
 
                 // Realizamos la comparacion
-                echo $skuW.' <--> '.$skuPDB.' ---> ';
 
                 // Comprobamos SKU iguales
                 if($skuW === $skuPDB){
