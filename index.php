@@ -43,18 +43,18 @@ class APIMetodos{ //Creando clase de metodos
             $listaProductosXcantidad = (array) $client->products->get_count();
             $listaProductos = (array) $client->products->get();
 
-            // Numero de productos en la Base de Datos 
+            // Numero de productos en la Base de Datos Woocommece
             $cantidadProductos = $listaProductosXcantidad['count']; // Variable Principal
 
-            // Numero de paginas de productos	
-            $listaProductosPaginas = (array) $listaProductos['http'];
-            $response = (array) $listaProductosPaginas['response'];
-            $headers = (array) $response['headers'];
-            $paginas = $headers['x-wc-totalpages'];
-            $paginas = (int)$paginas; // Variable Principal
+            // Importando stock de Woocommerce	
+            $listaProductosPaginas = (array) $listaProductos['http']; //Lista de productos JSON
+            $response = (array) $listaProductosPaginas['response']; // Metadatos de Lista de productos JSON
+            $headers = (array) $response['headers']; // Headers de los Metadatos
+            $paginas = $headers['x-wc-totalpages']; // Numero de paginas X productos Woocommerce
+            $paginas = (int)$paginas; // Variable numeros de paginas Principal
 
-            // Cantidad de productos en invenrario
-            echo 'Numero de productos',$cantidadProductos;
+            // Cantidad de productos en invenrario Woocommerce
+            echo 'Numero de productos en Woocommerce: ',$cantidadProductos;
             echo"<br>";
 
             for ($i = 1; $i <= $paginas; $i++) { // Vista de productos X paginas
@@ -222,7 +222,7 @@ class APIMetodos{ //Creando clase de metodos
         }
     }
     // funcion para actualizar primaryDB X productos simples
-    public function updateStockToPrimaryDBSimpleProduct(){
+    public function updateStockToPrimaryDB(){
 
         // Iniciando variables de autenticacion
         $options = array(
@@ -277,10 +277,6 @@ class APIMetodos{ //Creando clase de metodos
         $paginas = $headers['x-wc-totalpages']; // Numero de paginas X productos Woocommerce
         $paginas = (int)$paginas; // Variable numeros de paginas Principal
 
-        // Cantidad de productos en invenrario Woocommerce
-        echo 'Numero de productos en Woocommerce: ',$cantidadProductos;
-        echo"<br>";
-
         // Obtenemos la lista filtrada del stock de Woocommerce
         for ($i = 1; $i <= $paginas; $i++) { // Vista de productos X paginas
 
@@ -298,13 +294,42 @@ class APIMetodos{ //Creando clase de metodos
 
                 $a = (array) $lista[$q]; // Variable principal
 
-                // Filtracion de variables
-                $idWoocommer = $a['id'];
-                $skuWoocommer = $a['sku'];
-                $cantidadWoocommer = $a['stock_quantity'];
+                $listaProductosPadreVariant = (array) $client->products->get($a['id']);
+                $listaProductosVariants = (array) $listaProductosPadreVariant['product'];
+                $productosVariant = (array) $listaProductosVariants['variations'];
+                $j = 1;
 
-                // Lista de array filtrada
-                $woocommercerArray[] = array($idWoocommer, $skuWoocommer,$cantidadWoocommer);
+                if(empty($productosVariant[0])){
+                
+                    // Filtracion de variables
+                    $idWoocommer = $a['id'];
+                    $skuWoocommer = $a['sku'];
+                    $cantidadWoocommer = $a['stock_quantity'];
+
+                    $woocommercerArray[] = array($idWoocommer, $skuWoocommer,$cantidadWoocommer);
+
+                }else{
+
+                    for($h = 0; $h < $j; $h++){
+
+                        $j++;
+    
+                        if(empty($productosVariant[$h])){
+                            break;
+                        }
+                       
+                        $a = (array) $productosVariant[$h];
+
+                        $idWoocommer = $a['id'];
+                        $skuWoocommer = $a['sku'];
+                        $cantidadWoocommer = $a['stock_quantity'];
+
+                        // Lista de array filtrada
+                        $woocommercerArray[] = array($idWoocommer, $skuWoocommer,$cantidadWoocommer);
+    
+                    }
+
+                }
 
                 $q++;
             }
@@ -327,12 +352,16 @@ class APIMetodos{ //Creando clase de metodos
             $primaryDBArray[] = array("$idPrimaryDB", "$skuPrimaryDB","$cantidadPrimaryDB");
 
         }
-        
+
+        // Cantidad de productos en invenrario Woocommerce
+        $numeroProductosCompleto = count($woocommercerArray);
+        echo 'Numero de productos en Woocommerce: ',$numeroProductosCompleto;
+        echo"<br>";
         $rownVar1 = NULL; // validando arranque de bucle
         $referenciaHallada = 1;
 
         // Validamos las diferencias desde el stock de Woocommerce hacia, primaryDB
-        for($ii = 0; $ii < $cantidadProductos + 1; $ii++){ // Corremos la lista de Woocommerce X SKU
+        for($ii = 0; $ii < $numeroProductosCompleto + 1; $ii++){ // Corremos la lista de Woocommerce X SKU
             
             // verificamos si una referencia existe en primaryDB
             if($rownVar1 !== NULL){
@@ -401,12 +430,11 @@ class APIMetodos{ //Creando clase de metodos
                         echo "Mientras que para la referencia #: ",$skuPDB," -de PDB Tiene la cantidad total de: ",$stockPDB;
                         echo "<br>";
 
-                        $sqlud="UPDATE stock SET cantidad='$stockW' WHERE sku='$stockW'";
+                        $sqlud="UPDATE stock SET cantidad='$stockW' WHERE sku='$skuPDB'";
                         $queryud=mysqli_query($con,$sqlud);
 
                         if($queryud){
                             echo "Stock actualizado";
-                            Header("Location: index.php");
                         }else{
                             echo "Opp algo salimal que noob";
                         }
@@ -448,7 +476,7 @@ class APIMetodos{ //Creando clase de metodos
         echo $e->getMessage() . PHP_EOL;
         echo $e->getCode() . PHP_EOL;
         
-        if ( $e instanceof WC_API_Client_HTTP_Exception ) {
+            if ( $e instanceof WC_API_Client_HTTP_Exception ) {
         
             print_r( $e->get_request() );
             print_r( $e->get_response() );
@@ -459,6 +487,6 @@ class APIMetodos{ //Creando clase de metodos
 }
 
 $a = new APIMetodos();
-$a->updateStockToPrimaryDBSimpleProduct();
+$a->updateStockToPrimaryDB();
 
 ?>
