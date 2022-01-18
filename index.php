@@ -304,7 +304,7 @@ class APIMetodos{ //Creando clase de metodos
                 $cantidadWoocommer = $a['stock_quantity'];
 
                 // Lista de array filtrada
-                $woocommercerArray[] = array("p" => "$idWoocommer", "$skuWoocommer","$cantidadWoocommer");
+                $woocommercerArray[] = array($idWoocommer, $skuWoocommer,$cantidadWoocommer);
 
                 $q++;
             }
@@ -324,16 +324,40 @@ class APIMetodos{ //Creando clase de metodos
             $cantidadPrimaryDB = $stockPrimaryDB['cantidad'];
 
             // Lista de array filtrada
-            $primaryDBArray[] = array("p" => "$idPrimaryDB", "$skuPrimaryDB","$cantidadPrimaryDB");
+            $primaryDBArray[] = array("$idPrimaryDB", "$skuPrimaryDB","$cantidadPrimaryDB");
 
         }
-
-        // Variables de control
-        $rownVar1 = NULL; // Controla si ya a recorrido todo el stock de Woocommerce
+        
+        $rownVar1 = NULL; // validando arranque de bucle
+        $referenciaHallada = 1;
 
         // Validamos las diferencias desde el stock de Woocommerce hacia, primaryDB
-        for($ii = 0; $ii < $cantidadProductos ; $ii++){ // Corremos la lista de Woocommerce X SKU
+        for($ii = 0; $ii < $cantidadProductos + 1; $ii++){ // Corremos la lista de Woocommerce X SKU
             
+            // verificamos si una referencia existe en primaryDB
+            if($rownVar1 !== NULL){
+
+                if($referenciaHallada != 1){
+        
+                }else{
+        
+                    echo "La referencia #: ",$skuW," No esta en su primaryDB";
+                    echo "<br>";
+
+                    $sql="INSERT INTO stock VALUES('','$idW','$skuW','$stockW')";
+                    $query= mysqli_query($con,$sql);
+                            
+                    if($query){
+        
+                        echo"Producto añadido con exito";
+                        Header("Location: index.php");
+            
+                    }else {
+                        echo"que noob";
+                    }
+                }
+            }
+
             // Variables de control
             $rownVar = NULL; // Controla si ya a recorrido todo el stock de primaryDB
 
@@ -342,28 +366,13 @@ class APIMetodos{ //Creando clase de metodos
                 break;
             }
 
-            // verificamos si una referencia existe en primaryDB
-            if($rownVar1 !== NULL){
-
-                if($referenciaHallada !== NULL){
-
-                }else{
-
-                    echo "La referencia #: ",$skuW,"No esta en su primaryDB";
-                    echo "<br>";
-
-                }
-            }
-
             // Obteniendo datos
-            $skuW = $woocommercerArray[$ii][0];
-            $stockW = $woocommercerArray[$ii][1];
+            $idW = $woocommercerArray[$ii][0];
+            $skuW = $woocommercerArray[$ii][1];
+            $stockW = $woocommercerArray[$ii][2];
             $rownVar1 = 1; // validando arranque de bucle
 
-            for($qq = 0; $qq < $rowcount ; $qq++){ // comparamos los SKU de las listas
-
-                // Variables de control
-                $referenciaHallada = NULL;
+            for($qq = 0; $qq <= $rowcount ; $qq++){ // comparamos los SKU de las listas
 
                 // verificamos campos vacios
                 if(empty($primaryDBArray[$qq][0])){
@@ -371,38 +380,52 @@ class APIMetodos{ //Creando clase de metodos
                 }
 
                 // Obteniendo datos
-                $skuPDB = $primaryDBArray[$qq][0];
-                $stockPDB = $primaryDBArray[$qq][1];
+                $skuPDB = $primaryDBArray[$qq][1];
+                $stockPDB = (int) $primaryDBArray[$qq][2];
 
                 // Realizamos la comparacion
-                echo $skuW.'-- --'.$skuPDB.'--->';
+                echo $skuW.' <--> '.$skuPDB.' ---> ';
 
                 // Comprobamos SKU iguales
                 if($skuW === $skuPDB){
 
                     $rownVar = 1;
-                    
+                    $referenciaHallada = 2;
+
                     // Comprobamos Stock diferentes
                     if($stockW !== $stockPDB){
 
-                        $referenciaHallada = 1;
-
-                        echo "El Stock de Woocommerce se esta comprobando en primaryDB!";
+                        echo "El SKU de Woocommerce se ha encontrado en primaryDB!";
                         echo "<br>";
                         echo "Para la referencia #: ",$skuW," -de Woocommerce Tiene la cantidad total de: ",$stockW;
                         echo "<br>";
                         echo "Mientras que para la referencia #: ",$skuPDB," -de PDB Tiene la cantidad total de: ",$stockPDB;
                         echo "<br>";
 
+                        $sqlud="UPDATE stock SET cantidad='$stockW' WHERE sku='$stockW'";
+                        $queryud=mysqli_query($con,$sqlud);
+
+                        if($queryud){
+                            echo "Stock actualizado";
+                            Header("Location: index.php");
+                        }else{
+                            echo "Opp algo salimal que noob";
+                        }
+
+                        break;
+
                     }else{
 
                         echo "El Stock de Woocommerce se esta actualizando en su PrimaryDB!";
                         echo "<br>";
-                        echo "El producto: ",$skuW," Ah sido actualizado!";
+                        echo "El producto: ",$skuW," esta actualizado!";
                         echo "<br>";
+                        break;
                     }
 
                 }else{
+
+                    $referenciaHallada = 1;
 
                     // Validacion de referencias
                     if($rownVar !== NULL){
@@ -413,7 +436,7 @@ class APIMetodos{ //Creando clase de metodos
 
                     }else{
 
-                        echo "El Stock de Woocommerce esta desactualizado en su PrimaryDB!";
+                        echo "Buscando registros!";
                         echo "<br>";
 
                     }
