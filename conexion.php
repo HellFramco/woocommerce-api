@@ -4,7 +4,7 @@ function conectar(){
     $user="root";
     $pass="";
 
-    $bd="woocommerce";
+    $bd="shtex";
 
     $con=mysqli_connect($host,$user,$pass);
 
