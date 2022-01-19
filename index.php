@@ -221,7 +221,8 @@ class APIMetodos{ //Creando clase de metodos
         }
         }
     }
-    // funcion para actualizar primaryDB X productos simples
+    
+    // funcion para actualizar primaryDB X STOCk Woocommerce
     public function updateStockToPrimaryDB(){
 
         // Iniciando variables de autenticacion
@@ -235,7 +236,7 @@ class APIMetodos{ //Creando clase de metodos
 
         try {
 
-        // Autenticando Bases de datos
+        // Autenticando Base de datos Woocommerce
         $client = new WC_API_Client(
         'https://www.drabbalovers.co/',
         'ck_3e6abf70b8566f628bd50ffc70dd38779caefb00',
@@ -250,16 +251,18 @@ class APIMetodos{ //Creando clase de metodos
             'version' => 'wc/v3',
         ]);
 
+        // Autenticando Base de datos S-HTEX
         $con=conectar();
 
-        // Importando datos de primariDB
+        // Importando datos de S-HTEX DB
         $sql1 = "SELECT *  FROM inventarios_productos";
         $query1 =mysqli_query($con,$sql1);
-        
-        // Contando las filas del stock de primaryDB
+
+        // Contando las filas del stock de S-HTEX DB
         if ($result=mysqli_query($con,$sql1)) {
 
-            $rowcount=mysqli_num_rows($result);  // Numero de filas de S-HTEXDB
+            // Numero de filas de S-HTEXDB
+            $rowcount=mysqli_num_rows($result);
             echo 'Numero de productos en SHTEX: ', $rowcount; 
             echo"<br>";
         }
@@ -269,86 +272,93 @@ class APIMetodos{ //Creando clase de metodos
         $listaProductos = (array) $client->products->get();
 
         // Numero de productos en la Base de Datos Woocommerce
-        $cantidadProductos = $listaProductosXcantidad['count'];  // Productos del stock Woocomerce
+        $cantidadProductos = $listaProductosXcantidad['count'];
         echo 'Numero de productos en stock de Woocomerce: ',$cantidadProductos;
         echo"<br>";
 
         // Importando stock de Woocommerce	
-        $listaProductosPaginas = (array) $listaProductos['http'];  //Lista de productos JSON
-        $response = (array) $listaProductosPaginas['response'];  // Metadatos de Lista de productos JSON
-        $headers = (array) $response['headers'];  // Headers de los Metadatos
-        $paginas = $headers['x-wc-totalpages'];  // Numero de paginas X productos Woocommerce
-        $paginas = (int)$paginas;  // Variable numeros de paginas Principal
+        $listaProductosPaginas = (array) $listaProductos['http'];         //Lista de productos JSON
+        $response = (array) $listaProductosPaginas['response'];           // Metadatos de Lista de productos JSON
+        $headers = (array) $response['headers'];                          // Headers de los Metadatos
+        $paginas = $headers['x-wc-totalpages'];                           // Numero de paginas X productos Woocommerce
+        $paginas = (int)$paginas;                                         // Variable numeros de paginas Principal
 
-        // Obtenemos la lista filtrada del stock de Woocommerce
-        for ($i = 1; $i <= $paginas; $i++) {  // Vista de productos X paginas
+        // Obtenemos la lista filtrada del STOCk de Woocommerce
+        for ($i = 1; $i <= $paginas; $i++) {                              // Vista de productos X paginas
 
             // variables de control
             $q = 0;
-            $objPaginas = ['page' => $i];
-            $lista = (array) $woocommerce->get('products',$objPaginas);
+            $objPaginas = ['page' => $i];                                 // Numero de paginas disponibles
+            $lista = (array) $woocommerce->get('products',$objPaginas);   // Lista completa STOCK Woocommerce
 
-            while ($q <= 9) {  // Lista de stock Woocommerce filtrada
+            // Lista de stock Woocommerce filtrada
+            while ($q <= 9) {
 
                 // Si algun campo esta vacio rompe el ciclo
                 if(empty($lista[$q])){
                     break;
                 }
 
-                $a = (array) $lista[$q]; // Variable principal
+                $a = (array) $lista[$q];                                   // Variable principal
 
-                $listaProductosPadreVariant = (array) $client->products->get($a['id']);
-                $listaProductosVariants = (array) $listaProductosPadreVariant['product'];
-                $productosVariant = (array) $listaProductosVariants['variations'];
-                $j = 1;
+                // Obteniendo datos
+                $listaProductosPadreVariant = (array) $client->products->get($a['id']);     // Lista de referencias
+                $listaProductosVariants = (array) $listaProductosPadreVariant['product'];   // Lista de variantes X producto
+                $productosVariant = (array) $listaProductosVariants['variations'];          // Lista de variantes
+                $j = 1;                                                                     // Variable de control
 
-                //print_r($listaProductosPadreVariant);
-                //print_r($listaProductosVariants);
-                //print_r($productosVariant);
+                //print_r($listaProductosPadreVariant);                      // Vista Todo
+                //print_r($listaProductosVariants);                          // Vista de productos
+                //print_r($productosVariant);                                // Vista de variantes
 
+                // Separar los proctos simples de las variantes
                 if(empty($productosVariant[0])){
                 
                     // Filtracion de variables
-                    $idWoocommer = $a['id'];
-                    $skuWoocommer = $a['sku'];
-                    $cantidadWoocommer = $a['stock_quantity'];
+                    $idWoocommer = $a['id'];                            // ID referencia Producto Normal Woocommerce                            
+                    $skuWoocommer = $a['sku'];                          // SKU referencia Producto Normal Woocommerce
+                    $cantidadWoocommer = $a['stock_quantity'];          // STOCK referencia Producto Normal Woocommerce
 
-                    $woocommercerArray[] = array($idWoocommer, $skuWoocommer,$cantidadWoocommer);
-                    $tallas[] = array($idWoocommer, $skuWoocommer,$cantidadWoocommer);
+                    // Creando matriz de objetos Arrays
+                    $woocommercerArray[] = array($idWoocommer, $skuWoocommer,$cantidadWoocommer);   // Productos Simples 
+                    $tallas[] = array($idWoocommer, $skuWoocommer,$cantidadWoocommer);              // Segmentando Tallas
 
                 }else{
 
+                    // Sustrayendo variables
                     for($h = 0; $h < $j; $h++){
 
-                        $j++;
-    
+                        $j++;                                               // Variable de control
+
+                        // Si ya no hay mas Variantes rompe
                         if(empty($productosVariant[$h])){
                             break;
                         }
 
-                        $b = $listaProductosVariants['sku'];
-                        $a = (array) $productosVariant[$h];
+                        // Definiendo datos
+                        $b = $listaProductosVariants['sku'];                 // SKU de productos Padres
+                        $a = (array) $productosVariant[$h];                  // Obteniendo variantes 
 
-                        $idWoocommer = $a['id'];
-                        $skuWoocommer = $a['sku'];
-                        $cantidadWoocommer = $a['stock_quantity'];
+                        $idWoocommer = $a['id'];                             // ID producto variante
+                        $skuWoocommer = $a['sku'];                           // SKU producto variante
+                        $cantidadWoocommer = $a['stock_quantity'];           // STOCK producto variante
 
-                        // Lista de array filtrada
-                        $woocommercerArray[] = array($idWoocommer, $skuWoocommer,$cantidadWoocommer);
-                        $woocommercerArrayvariant[] = array($b, $idWoocommer, $skuWoocommer,$cantidadWoocommer);
+                        // Creando matriz de objetos Arrays
+                        $woocommercerArray[] = array($idWoocommer, $skuWoocommer,$cantidadWoocommer);  // Matriz contadora
+                        $woocommercerArrayvariant[] = array($b, $idWoocommer, $skuWoocommer,$cantidadWoocommer);// Matriz de variantes
     
                     }
 
-                    $tallas[] = $woocommercerArrayvariant;
-                    $woocommercerArrayvariant = NULL;
+                    $tallas[] = $woocommercerArrayvariant;                    // Agregando matrices independientes
+                    $woocommercerArrayvariant = NULL;                         // Reseteando Matriz
                 }
 
-                $q++;
+                $q++;                                                         // Variante de control
             }
         }
 
         // Obtenemos la lista filtrada del stock de S_HTEX DB
-        while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+        while ($stockPrimaryDB =mysqli_fetch_array($query1)){              // Vista de productos S_HTEX DB
 
             // Si algun campo esta vacio rompe el ciclo
             if(empty($query1)){
@@ -380,257 +390,156 @@ class APIMetodos{ //Creando clase de metodos
             $cantidadTU = $stockPrimaryDB['tallau'];
             $cantidadTEST = $stockPrimaryDB['tallaest'];
 
-            // Lista de array filtrada
+            // Generando matriz de productos
             $primaryDBArray[] = array("$idPrimaryDB", "$skuPrimaryDB",array("$cantidadT6","$cantidadT8","$cantidadT10","$cantidadT12","$cantidadT14","$cantidadT16","$cantidadT18","$cantidadT20","$cantidadT26","$cantidadT28","$cantidadT30","$cantidadT32","$cantidadT34","$cantidadT36","$cantidadT38","$cantidadTS","$cantidadTM","$cantidadTL","$cantidadTXL","$cantidadTU","$cantidadTEST"));
 
         }
 
-        //print_r($primaryDBArray);  // Arrays de productos X tallas S_HTEX DB
-        //print_r($woocommercerArray);  // Array contador de productos
-        //print_r($tallas);  // Array de Productos X Variantes
+        //print_r($primaryDBArray);                                        // Arrays de productos X tallas S_HTEX DB
+        //print_r($woocommercerArray);                                     // Array contador de productos
+        //print_r($tallas);                                                // Array de Productos X Variantes
 
         // Cantidad de productos en invenrario Woocommerce
-        $numeroProductosCompleto = count($woocommercerArray);
+        $numeroProductosCompleto = count($woocommercerArray);              // Numero completo productos en Woocommerce
         echo 'Numero de productos en Woocommerce: ',$numeroProductosCompleto;
         echo"<br>";
-        $listaRecorrida = 0;
-        for($i = 0; $i < $cantidadProductos + 1; $i++){ // Corremos la lista de Woocommerce X SKU
+
+        $listaRecorrida = 0;                                                // Variable de control
+
+        // Iniciando comprobasiones de STOCK
+        for($i = 0; $i < $cantidadProductos + 1; $i++){                     // Corremos la lista de Woocommerce X SKU
             
-              
+            // Verificar si una lista de variantes ya a sido recorrida
             if($listaRecorrida !== 0){
 
+                // Verificar si la referencia de variantes a sido ubicada en S_HTEX DB
                 if($referenciaHallada == 0){
 
                     echo 'Referencia inexistente en S-Htex DB';
                     echo "<br>";
-                    echo 'Procediendo a actualizar referencia #: ', $skuPadreW;
+                    echo 'Procediendo a actualizar referencia #: ', $skuPadreW;    // SKU padre de producto Woocommerce
                     echo "<br>";
 
+                    // Si la referencia no fue hallada en S_HTEX DB Crearla
                     $sql="INSERT INTO inventarios_productos VALUES ('', '$skuPadreW', '', '', '', '', '', '', '', '', '', '', '', '', '', '$stockTalla6', '$stockTalla8', '$stockTalla10', '$stockTalla12', '$stockTalla14', '$stockTalla16', '$stockTalla18', '$stockTalla20', '$stockTalla26', '$stockTalla28', '$stockTalla30', '$stockTalla32', '$stockTalla34', '$stockTalla36', '$stockTalla38', '$stockTallaS', '$stockTallaM', '$stockTallaL', '$stockTallaXL', '$stockTallaU', '$stockTallaEST', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '')";
                     $query= mysqli_query($con,$sql);
 
                     if($query){
 
+                        // si la referencia fue creada
                         echo'Referencia #: ',$skuPadreW,' lista!';
                             
                     }else {
-                        echo"noob";
+
+                        // Si la referencia no fue creada
+                        echo'Referencia #: ',$skuPadreW,' No fue actualizada!';
                     }
 
                 }
             }
 
+            // Si alguna referencia es vacia rompe
             if(empty($tallas[$i])){
                 break;
             }
 
-            $tallasVariantes = (array)$tallas[$i];
-            
+            // Definiendo variables de los productos variantes
+            $tallasVariantes = (array)$tallas[$i];                          // Lista de datos de los productos variantes
 
+            // Verificar si la lista es simple o variante
             if(empty($tallas[$i][0][0])){
                 
+                // Si la lista es simple entra aqui
+
             }else{
 
-                $skuPadreW = $tallasVariantes[0][0];
+                // Obteniendo datos
+                $skuPadreW = $tallasVariantes[0][0];                         // SKU Padre de los productos variantes Woocommerce
 
-                $stockTalla10 = $tallasVariantes[0][3];
-                $stockTalla12 = $tallasVariantes[1][3];
-                $stockTalla14 = $tallasVariantes[2][3];
-                $stockTalla16 = $tallasVariantes[3][3];
-                $stockTalla18 = $tallasVariantes[4][3];
-                $stockTalla20 = $tallasVariantes[5][3];
-                $stockTalla26 = $tallasVariantes[6][3];
-                $stockTalla28 = $tallasVariantes[7][3];
-                $stockTalla30 = $tallasVariantes[8][3];
-                $stockTalla32 = $tallasVariantes[9][3];
-                $stockTalla34 = $tallasVariantes[10][3];
-                $stockTalla36 = $tallasVariantes[11][3];
-                $stockTalla38 = $tallasVariantes[12][3];
-                $stockTalla6 = $tallasVariantes[13][3];
-                $stockTalla8 = $tallasVariantes[14][3];
-                $stockTallaEST = $tallasVariantes[15][3];
-                $stockTallaL = $tallasVariantes[16][3];
-                $stockTallaM = $tallasVariantes[17][3];
-                $stockTallaS = $tallasVariantes[18][3];
-                $stockTallaU = $tallasVariantes[19][3];
-                $stockTallaXL = $tallasVariantes[20][3];
+                $stockTalla10 = $tallasVariantes[0][3];                      // STOCK Talla 10 Woocommerce
+                $stockTalla12 = $tallasVariantes[1][3];                      // STOCK Talla 12 Woocommerce
+                $stockTalla14 = $tallasVariantes[2][3];                      // STOCK Talla 14 Woocommerce
+                $stockTalla16 = $tallasVariantes[3][3];                      // STOCK Talla 16 Woocommerce
+                $stockTalla18 = $tallasVariantes[4][3];                      // STOCK Talla 18 Woocommerce
+                $stockTalla20 = $tallasVariantes[5][3];                      // STOCK Talla 20 Woocommerce
+                $stockTalla26 = $tallasVariantes[6][3];                      // STOCK Talla 26 Woocommerce
+                $stockTalla28 = $tallasVariantes[7][3];                      // STOCK Talla 28 Woocommerce
+                $stockTalla30 = $tallasVariantes[8][3];                      // STOCK Talla 30 Woocommerce
+                $stockTalla32 = $tallasVariantes[9][3];                      // STOCK Talla 32 Woocommerce
+                $stockTalla34 = $tallasVariantes[10][3];                     // STOCK Talla 34 Woocommerce
+                $stockTalla36 = $tallasVariantes[11][3];                     // STOCK Talla 36 Woocommerce
+                $stockTalla38 = $tallasVariantes[12][3];                     // STOCK Talla 38 Woocommerce
+                $stockTalla6 = $tallasVariantes[13][3];                      // STOCK Talla 6 Woocommerce
+                $stockTalla8 = $tallasVariantes[14][3];                      // STOCK Talla 8 Woocommerce
+                $stockTallaEST = $tallasVariantes[15][3];                    // STOCK Talla EST Woocommerce
+                $stockTallaL = $tallasVariantes[16][3];                      // STOCK Talla L Woocommerce
+                $stockTallaM = $tallasVariantes[17][3];                      // STOCK Talla M Woocommerce
+                $stockTallaS = $tallasVariantes[18][3];                      // STOCK Talla S Woocommerce
+                $stockTallaU = $tallasVariantes[19][3];                      // STOCK Talla U Woocommerce
+                $stockTallaXL = $tallasVariantes[20][3];                     // STOCK Talla XL Woocommerce
 
-                $referenciaHallada = 0;
-                $listaRecorrida = 0;
+                $referenciaHallada = 0;                               // Verifica si la referencia n a sido hallada
+                $listaRecorrida = 0;                                  // verifica si la lista de productos de S_HTEX a sido completada
 
+                // Corremos la lista de productos o referencia en n Tallas
                 for($ii = 0; $ii < $rowcount +1; $ii++){
 
+                    // si no hay producto rompe
                     if(empty($primaryDBArray[$ii])){
                         break;
                     }
 
+                    // Corremos los SKU de las referencia de S_HTEX DB
                     $skuDB = $primaryDBArray[$ii][1];
 
+                    // Verificamos los SKU que son iguales de Woocommerce o S_HTEX
                     if($skuPadreW === $skuDB){
 
-                        $referenciaHallada = 1;
+                        $referenciaHallada = 1;                        // Asignamos si la referencia fue encontrada en la lista de productos de S_HTEX DB
                         
+                        // Actualiza los datos de tallas X STOCK de variantes de Woocommerce mientras SKU S_HTEX DB sea igual a SKU padre de Woocommerce
                         $sqlUP="UPDATE inventarios_productos SET talla6='$stockTalla6',talla8='$stockTalla8',talla10='$stockTalla10',talla12='$stockTalla12',talla14='$stockTalla14',talla16='$stockTalla16',talla18='$stockTalla18',talla20='$stockTalla20',talla26='$stockTalla26',talla28='$stockTalla28',talla30='$stockTalla30',talla32='$stockTalla32',talla34='$stockTalla34',talla36='$stockTalla36',talla38='$stockTalla38',tallas='$stockTallaS',tallam='$stockTallaM',tallal='$stockTallaL',tallaxl='$stockTallaXL',tallau='$stockTallaU',tallaest='$stockTallaEST' WHERE referencia ='$skuPadreW'";
                         $queryUP=mysqli_query($con,$sqlUP);
 
+                        // Verificamos la consulta
                         if($queryUP){
+
+                            // Si la actualizacion fue exitosa
                             echo "Base de datos al dia!";
+
                         }else{
-                            echo "noob";
+
+                            // si la actualizacion no se realizo
+                            echo "Base de datos no se pudo actualizar / Woocommerce!";
+
                         }
+
+                    }else{                                      // Si la referencia no fue Hallada dentro de S_HTEX DB
                         
-
-
-
-                    }else{
-                        
+                        // Verificamos si la lista de producto de S_HTEX DB fue recorrida en su totalidad
                         if($listaRecorrida != NULL){
 
+                            // Referencia de Woocommerce no esta en la lista de S_HTEX DB
                             echo 'Referencia no encontrada #: ',$skuPadreW;
                             echo "<br>";
                             
-                        }else{  
+                        }else{                                   // Si la lista no ha sido recorrida sigue buscando
 
+                            // Buscando referencias
                             echo 'Actualizando';
                             echo "<br>";
 
                         }
-
                     }
-
                 }
 
+                // Establecemos que la lista de S_HTEX DB ya fue recorrida
                 $listaRecorrida = 1;
 
             }
-
         }
 
-
-
-        /*
-        // Validamos las diferencias desde el stock de Woocommerce hacia, primaryDB
-        for($ii = 0; $ii < $numeroProductosCompleto + 1; $ii++){ // Corremos la lista de Woocommerce X SKU
-            
-            // verificamos si una referencia existe en primaryDB
-            if($rownVar1 !== NULL){
-
-                if($referenciaHallada != 1){
-        
-                }else{
-        
-                    echo "La referencia #: ",$skuW," No esta en su primaryDB";
-                    echo "<br>";
-
-                    
-
-                    $sql="INSERT INTO stock VALUES('','$idW','$skuW','$stockW')";
-                    $query= mysqli_query($con,$sql);
-                            
-                    if($query){
-        
-                        echo"Producto añadido con exito";
-
-                    }else {
-                        echo"que noob";
-                    }
-                }
-            }
-
-            // Variables de control
-            $rownVar = NULL; // Controla si ya a recorrido todo el stock de primaryDB
-
-            // verificamos campos vacios
-            if(empty($woocommercerArray[$ii])){
-                break;
-            }
-
-            if(empty($woocommercerArray[$ii][0][0])){
-                
-                
-                echo 'Array producto normal';
-
-                // Obteniendo datos
-                $idW = $woocommercerArray[$ii][0];
-                $skuW = $woocommercerArray[$ii][1];
-                $stockW = $woocommercerArray[$ii][2];
-                $rownVar1 = 1; // validando arranque de bucle
-
-                for($qq = 0; $qq <= $rowcount ; $qq++){ // comparamos los SKU de las listas
-
-                    // verificamos campos vacios
-                    if(empty($primaryDBArray[$qq][0])){
-                        break;
-                    }
-
-                    // Obteniendo datos
-                    $skuPDB = $primaryDBArray[$qq][1];
-                    $stockPDB = (int) $primaryDBArray[$qq][2];
-
-                    // Comprobamos SKU iguales
-                    if($skuW === $skuPDB){
-
-                        $rownVar = 1;
-                        $referenciaHallada = 2;
-
-                        // Comprobamos Stock diferentes
-                        if($stockW !== $stockPDB){
-
-                            echo "El SKU de Woocommerce se ha encontrado en primaryDB!";
-                            echo "<br>";
-                            echo "Para la referencia #: ",$skuW," -de Woocommerce Tiene la cantidad total de: ",$stockW;
-                            echo "<br>";
-                            echo "Mientras que para la referencia #: ",$skuPDB," -de PDB Tiene la cantidad total de: ",$stockPDB;
-                            echo "<br>";
-    
-                            $sqlud="UPDATE stock SET cantidad='$stockW' WHERE sku='$skuPDB'";
-                            $queryud=mysqli_query($con,$sqlud);
-    
-                            if($queryud){
-                                echo "Stock actualizado";
-                            }else{
-                                echo "Opp algo salimal que noob";
-                            }
-    
-                            break;
-    
-                        }else{
-    
-                            echo "El Stock de Woocommerce se esta actualizando en su PrimaryDB!";
-                            echo "<br>";
-                            echo "El producto: ",$skuW," esta actualizado!";
-                            echo "<br>";
-                            break;
-                        }
-    
-                    }else{
-    
-                        $referenciaHallada = 1;
-    
-                        // Validacion de referencias
-                        if($rownVar !== NULL){
-                            
-                            echo " Referencia al dia!";
-                            echo "<br>";
-                            break;
-    
-                        }else{
-    
-                            echo "Buscando registros!";
-                            echo "<br>";
-    
-                        }
-                    }
-                }
-            
-
-            }else{
-                
-            }
-
-        }
-        */
-
+        // Iniciando metodos de catcheo de errores
         }catch ( WC_API_Client_Exception $e ) {
 
         echo $e->getMessage() . PHP_EOL;
@@ -640,12 +549,12 @@ class APIMetodos{ //Creando clase de metodos
         
             print_r( $e->get_request() );
             print_r( $e->get_response() );
-        }
+            }
         }
     }
-
 }
 
+// Instanciando Funciones 
 $a = new APIMetodos();
 $a->updateStockToPrimaryDB();
 
