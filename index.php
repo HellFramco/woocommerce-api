@@ -428,11 +428,13 @@ class APIMetodos{ //Creando clase de metodos
 
                         // si la referencia fue creada
                         echo'Referencia #: ',$skuPadreW,' lista!';
+                        echo "<br>";
                             
                     }else {
 
                         // Si la referencia no fue creada
                         echo'Referencia #: ',$skuPadreW,' No fue actualizada!';
+                        echo "<br>";
                     }
 
                 }
@@ -506,11 +508,13 @@ class APIMetodos{ //Creando clase de metodos
 
                             // Si la actualizacion fue exitosa
                             echo "Base de datos al dia!";
+                            echo "<br>";
 
                         }else{
 
                             // si la actualizacion no se realizo
                             echo "Base de datos no se pudo actualizar / Woocommerce!";
+                            echo "<br>";
 
                         }
 
