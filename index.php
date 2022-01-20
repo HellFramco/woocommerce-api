@@ -272,6 +272,7 @@ class APIMetodos{ //Creando clase de metodos
                 // Separar los proctos simples de las variantes
                 if(empty($productosVariant[0])){
                 
+                    /*
                     // Filtracion de variables
                     $idWoocommer = $producto['id'];                            // ID referencia Producto Normal Woocommerce                            
                     $skuWoocommer = $producto['sku'];                          // SKU referencia Producto Normal Woocommerce
@@ -280,6 +281,10 @@ class APIMetodos{ //Creando clase de metodos
                     // Creando matriz de objetos Arrays
                     $woocommercerArray[] = array($idWoocommer, $skuWoocommer,$cantidadWoocommer);   // Productos Simples 
                     $tallas[] = array($idWoocommer, $skuWoocommer,$cantidadWoocommer);              // Segmentando Tallas
+                    */
+
+                    echo 'Revice su inventario en Woocommerce Pues no deben aver productos simples';
+                    break;
 
                 }else{
 
@@ -369,7 +374,7 @@ class APIMetodos{ //Creando clase de metodos
             $cantidadTEST = $stockPrimaryDB['tallaest'];
 
             // Generando matriz de productos
-            $primaryDBArray[] = array("$idPrimaryDB", "$skuPrimaryDB",array("$cantidadT6","$cantidadT8","$cantidadT10","$cantidadT12","$cantidadT14","$cantidadT16","$cantidadT18","$cantidadT20","$cantidadT26","$cantidadT28","$cantidadT30","$cantidadT32","$cantidadT34","$cantidadT36","$cantidadT38","$cantidadTS","$cantidadTM","$cantidadTL","$cantidadTXL","$cantidadTU","$cantidadTEST"));
+            $primaryDBArray[] = array("$idPrimaryDB", "$skuPrimaryDB","$cantidadT6","$cantidadT8","$cantidadT10","$cantidadT12","$cantidadT14","$cantidadT16","$cantidadT18","$cantidadT20","$cantidadT26","$cantidadT28","$cantidadT30","$cantidadT32","$cantidadT34","$cantidadT36","$cantidadT38","$cantidadTS","$cantidadTM","$cantidadTL","$cantidadTXL","$cantidadTU","$cantidadTEST");
 
         }
 
@@ -412,6 +417,10 @@ class APIMetodos{ //Creando clase de metodos
                     $data = [
                         'name' => 'test',
                         'type' => 'variable',
+                        'sku' => $SKUPrimaryDB,
+                        'virtual' => true,
+                        'manage_stock' => true,
+                        'stock_quantity' => 7,
                         'description' => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',
                         'short_description' => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.',
                         'categories' => [
@@ -454,20 +463,74 @@ class APIMetodos{ //Creando clase de metodos
                                 'name' => 'Size',
                                 'option' => 'S'
                             ]
-                        ]
+                        ],
+
                     ];
 
-                    if(empty(print_r($woocommerce->post('products', $data)))){
+                    if(empty($datosUpdate = $woocommerce->post('products', $data))){
 
                         echo 'La referencia no se agrego a Woocommerce';
                         echo "<br>";
+                        break;
 
                     }else{
 
-                        echo 'La referencia se agrego a Woocommerrce Procediendo a Udtatearla';
+                        echo 'La referencia se agrego a Woocommerrce Procediendo a crear sus variantes';
                         echo "<br>";
 
+                        $idUpdate = $datosUpdate->id;
+                        $SKUVariante = $datosUpdate->sku.'-'.$idUpdate;
+
+                        $data = [
+                            'sku' => $SKUVariante,
+                            'regular_price' => '9.00',
+                            'image' => [
+                            ],
+                            'attributes' => [
+                                [
+                                    'id' => 9,
+                                    'option' => 'Black'
+                                ]
+                            ]
+                        ];
                         
+
+                        if(empty( $varianteUpdate = $woocommerce->post('products/'.$idUpdate.'/variations', $data))){
+
+                            echo 'La variacion no se agrego';
+                            echo "<br>";
+                            break;
+
+                        }else{
+
+                            
+                            echo 'La variacion si se agrego'.$idUpdate.'Procediendo a actualizar la variacion';
+                            echo "<br>";
+
+                            $IDVarianteUpdate = $varianteUpdate->id;
+
+                            $data = [
+                                'regular_price' => '10.00',
+                                'stock_quantity' => $TALLA6
+                            ];
+                            
+                            if(empty($woocommerce->put('products/'.$idUpdate.'/variations/'.$IDVarianteUpdate, $data))){
+
+                                echo 'La variacion no se actualizo'.$IDVarianteUpdate.'tomo datos por defecto';
+                                echo "<br>";
+                                break;
+
+                            }else{
+
+                                echo 'La variacion si se actualizo'.$IDVarianteUpdate.'tomo datos del sistema';
+                                echo "<br>";
+
+                                
+                                Header("Location: index.php");
+                                
+                            }
+
+                        }
 
                     }
 
@@ -478,6 +541,29 @@ class APIMetodos{ //Creando clase de metodos
 
             $SKUPrimaryDB = $primaryDBArray[$i][1];    // SKU REFERENCIAS CORRIDAS PrimaryDB
 
+            $TALLA6 = $primaryDBArray[$i][2];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLA8 = $primaryDBArray[$i][3];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLA10 = $primaryDBArray[$i][4];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLA12 = $primaryDBArray[$i][5];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLA14 = $primaryDBArray[$i][6];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLA16 = $primaryDBArray[$i][7];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLA18 = $primaryDBArray[$i][8];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLA20 = $primaryDBArray[$i][9];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLA26 = $primaryDBArray[$i][10];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLA28 = $primaryDBArray[$i][11];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLA30 = $primaryDBArray[$i][12];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLA32 = $primaryDBArray[$i][13];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLA34 = $primaryDBArray[$i][14];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLA36 = $primaryDBArray[$i][15];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLA38 = $primaryDBArray[$i][16];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLAS = $primaryDBArray[$i][17];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLAM = $primaryDBArray[$i][18];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLAL = $primaryDBArray[$i][19];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLAXL = $primaryDBArray[$i][20];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLAU = $primaryDBArray[$i][21];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+            $TALLAEST = $primaryDBArray[$i][22];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+
+
             $SKU1XSKU2 = 0;
             for($ii=0; $ii < $cantidadProductos; $ii++){
 
@@ -485,8 +571,8 @@ class APIMetodos{ //Creando clase de metodos
                     break;
                 }
 
-                $ggg = (array) $tallas[$ii][0][2];        // SKU REFERENCIAS CORRIDAS Woocommerce
-                $SKUWoocommerce = $ggg[2];
+                $skuGenerade = (array) $tallas[$ii][0];        // SKU REFERENCIAS CORRIDAS Woocommerce
+                $SKUWoocommerce = $skuGenerade[2];
 
                 if($SKUPrimaryDB === $SKUWoocommerce){
 
