@@ -4,7 +4,7 @@ function conectar(){
     $user="root";
     $pass="";
 
-    $bd="shtex";
+    $bd="drabbaje_app_ventas";
 
     $con=mysqli_connect($host,$user,$pass);
 

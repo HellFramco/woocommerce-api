@@ -1,4 +1,9 @@
+
 <?php
+//header("Refresh: 300; URL=index.php");
+
+set_time_limit(300000);
+//header("Refresh:12 ; URL='index.php'");
 
 // Cargue de librerias
 require __DIR__ . '/vendor/autoload.php';
@@ -164,7 +169,18 @@ class APIMetodos{ //Creando clase de metodos
                 'version' => 'wc/v3',
             ]);
 
-            $client->products->delete( '2345', true );
+            
+            $data = [
+                'attributes' => [
+                    [
+                        'id' => 0,
+                        'name' => 'Size',
+                        'option' => 'talla8'
+                    ]
+                ]
+            ];
+
+            print_r($woocommerce->put('products/4671/variations/4673', $data));
 
         }catch ( WC_API_Client_Exception $e ) {
 
@@ -183,411 +199,638 @@ class APIMetodos{ //Creando clase de metodos
 
         // Iniciando variables de autenticacion
         $options = array(
-        'debug'           => true,
-        'return_as_array' => false,
-        'validate_url'    => false,
-        'timeout'         => 30,
-        'ssl_verify'      => false,
+            'debug'           => true,
+            'return_as_array' => false,
+            'validate_url'    => false,
+            'timeout'         => 30,
+            'ssl_verify'      => false,
         );
 
         try {
+            // Accediendo API Woocommerce
+                $client = new WC_API_Client(
+                'https://www.drabbalovers.co/',
+                'ck_3e6abf70b8566f628bd50ffc70dd38779caefb00',
+                'cs_2a4c74eb3f5ee2e70f57a47d540c9d28c3f19c70',
+                $options );
 
-        // Autenticando 
-        $client = new WC_API_Client(
-        'https://www.drabbalovers.co/',
-        'ck_3e6abf70b8566f628bd50ffc70dd38779caefb00',
-        'cs_2a4c74eb3f5ee2e70f57a47d540c9d28c3f19c70',
-        $options );
+                $woocommerce = new Client(
+                'https://www.drabbalovers.co/', 
+                'ck_3e6abf70b8566f628bd50ffc70dd38779caefb00', 
+                'cs_2a4c74eb3f5ee2e70f57a47d540c9d28c3f19c70',
+                [
+                    'version' => 'wc/v3',
+                ]);
 
-        $woocommerce = new Client(
-        'https://www.drabbalovers.co/', 
-        'ck_3e6abf70b8566f628bd50ffc70dd38779caefb00', 
-        'cs_2a4c74eb3f5ee2e70f57a47d540c9d28c3f19c70',
-        [
-            'version' => 'wc/v3',
-        ]);
+            // Accediendo Base de datos S-HTEX
+                $con=conectar();
 
-        // Autenticando Base de datos S-HTEX
-        $con=conectar();
+            // Inciando methos GET
+                $listaProductosXcantidad = (array) $client->products->get_count();
+                $listaProductos = (array) $client->products->get();
 
-        // Importando datos de S-HTEX DB
-        $sql1 = "SELECT *  FROM inventarios_productos";
-        $query1 =mysqli_query($con,$sql1);
+            // Importando stock de Woocommerce	
+                $listaProductosPaginas = (array) $listaProductos['http'];         //Lista de productos JSON
+                $response = (array) $listaProductosPaginas['response'];           // Metadatos de Lista de productos JSON
+                $headers = (array) $response['headers'];                          // Headers de los Metadatos
+                $paginas =  $headers['x-wc-totalpages'];                           // Numero de paginas X productos Woocommerce
+                $paginas = (int)$paginas;                                         // Variable numeros de paginas Principal
 
-        // Contando las filas del stock de S-HTEX DB
-        if ($result=mysqli_query($con,$sql1)) {
+            // Importando datos de S-HTEX DB
+                $sql1 = "SELECT *  FROM inventarios_productos";
+                $query1 =mysqli_query($con,$sql1);
 
-            // Numero de filas de S-HTEXDB
-            $rowcount=mysqli_num_rows($result);
-            echo 'Numero de productos en SHTEX: ', $rowcount; 
-            echo"<br>";
-        }
+            // Numero Referencias del stock de S-HTEX DB
+                if ($result=mysqli_query($con,$sql1)) {
 
-        // Inciando methos GET
-        $listaProductosXcantidad = (array) $client->products->get_count();
-        $listaProductos = (array) $client->products->get();
-
-        // Numero de productos en la Base de Datos Woocommerce
-        $cantidadProductos = $listaProductosXcantidad['count'];
-        echo 'Numero de referencias de Woocomerce: ',$cantidadProductos;
-        echo"<br>";
-
-        // Importando stock de Woocommerce	
-        $listaProductosPaginas = (array) $listaProductos['http'];         //Lista de productos JSON
-        $response = (array) $listaProductosPaginas['response'];           // Metadatos de Lista de productos JSON
-        $headers = (array) $response['headers'];                          // Headers de los Metadatos
-        $paginas = $headers['x-wc-totalpages'];                           // Numero de paginas X productos Woocommerce
-        $paginas = (int)$paginas;                                         // Variable numeros de paginas Principal
-
-        // Obtenemos la lista filtrada del STOCk de Woocommerce
-        for ($i = 1; $i <= $paginas; $i++) {                              // Vista de productos X paginas
-
-            // variables de control
-            $q = 0;
-            $objPaginas = ['page' => $i];                                 // Numero de paginas disponibles
-            $lista = (array) $woocommerce->get('products',$objPaginas);   // Lista completa STOCK Woocommerce
-
-            // Lista de stock Woocommerce filtrada
-            while ($q <= 9) {
-
-                // Si algun campo esta vacio rompe el ciclo
-                if(empty($lista[$q])){
-                    break;
+                    // Numero de filas de S-HTEXDB
+                    $rowcount=mysqli_num_rows($result);
+                    echo 'Numero de productos en SHTEX: ', $rowcount; 
+                    echo"<br>";
                 }
 
-                $producto = (array) $lista[$q];                                   // Lista principal
+            // Numero Referencias en Woocommerce
+                $cantidadProductos = $listaProductosXcantidad['count'];
+                echo 'Numero de referencias de Woocomerce: ',$cantidadProductos;
+                echo"<br>";
 
-                $SKUProductosWoocommerce[] = (array) $producto['sku'];
+            // Obtenemos la lista filtrada del STOCk de Woocommerce
+                for ($i = 1; $i <= $paginas; $i++) {                              // Vista de productos X paginas
 
-                // Obteniendo datos
-                $listaProductosPadreVariant1 = (array) $client->products->get($producto['id']);
-                $listaProductosVariants[] = (array) $listaProductosPadreVariant1['product'];        // Lista de Productos
-                
-                $listaProductosPadreVariant = (array) $client->products->get($producto['id']);
-                $listaProductosVariants = (array) $listaProductosPadreVariant['product']; 
-                $productosVariant[] = (array) $listaProductosVariants['variations'];                // Lista de variantes
-                
-                $j = 1;                                                                             // Variable de control
+                    // variables de control
+                    $q = 0;
+                    $objPaginas = ['page' => $i];                                 // Numero de paginas disponibles
+                    $lista = (array) $woocommerce->get('products',$objPaginas);   // Lista completa STOCK Woocommerce
 
-                // Separar los proctos simples de las variantes
-                if(empty($productosVariant[0])){
-                
-                    /*
-                    // Filtracion de variables
-                    $idWoocommer = $producto['id'];                            // ID referencia Producto Normal Woocommerce                            
-                    $skuWoocommer = $producto['sku'];                          // SKU referencia Producto Normal Woocommerce
-                    $cantidadWoocommer = $producto['stock_quantity'];          // STOCK referencia Producto Normal Woocommerce
+                    // Lista de stock Woocommerce filtrada
+                    while ($q <= 9) {
 
-                    // Creando matriz de objetos Arrays
-                    $woocommercerArray[] = array($idWoocommer, $skuWoocommer,$cantidadWoocommer);   // Productos Simples 
-                    $tallas[] = array($idWoocommer, $skuWoocommer,$cantidadWoocommer);              // Segmentando Tallas
-                    */
-
-                    echo 'Revice su inventario en Woocommerce Pues no deben aver productos simples';
-                    break;
-
-                }else{
-
-                    // Sustrayendo variables
-                    for($h = 0; $h < $j; $h++){
-                        $j++;                                               // Variable de control
-
-                        // Si ya no hay mas Variantes rompe
-                        if(empty($productosVariant[$h])){
+                        // Si algun campo esta vacio rompe el ciclo
+                        if(empty($lista[$q])){
                             break;
                         }
 
-                        // Definiendo datos
-                        $intoVariacionXProducto = (array) $productosVariant[$h]; 
+                        $producto = (array) $lista[$q];                                   // Lista principal
+
+                        $SKUProductosWoocommerce[] = (array) $producto['sku'];
+
+                        // Obteniendo datos
+                        $listaProductosPadreVariant1 = (array) $client->products->get($producto['id']);
+                        $listaProductosVariants[] = (array) $listaProductosPadreVariant1['product'];        // Lista de Productos
                         
-                        // SKU producto padre
+                        $listaProductosPadreVariant = (array) $client->products->get($producto['id']);
+                        $listaProductosVariants = (array) $listaProductosPadreVariant['product']; 
+                        $productosVariant[] = (array) $listaProductosVariants['variations'];                // Lista de variantes
                         
-                        $idPadre = $listaProductosVariants['id'];
-                        $SKUPabre = $listaProductosVariants['sku'];
-                        // Agregando matrices pendientes
-                        unset($woocommercerArrayvariant);
+                        $j = 1;                                                                             // Variable de control
+
+                        // Separar los proctos simples de las variantes
+                        if(empty($productosVariant[0])){
                         
-                        for($hh = 0; $hh < 21; $hh++){
+                            // Filtracion de variables
 
-                            // Si ya no hay mas Variantes rompe
-                            if(empty($intoVariacionXProducto[$hh])){
-                                break;
-                            }
+                                $idWoocommer = $producto['id'];                            // ID referencia Producto Normal Woocommerce                            
+                                $skuWoocommer = $producto['sku'];                          // SKU referencia Producto Normal Woocommerce
+                                $cantidadWoocommer = $producto['stock_quantity'];          // STOCK referencia Producto Normal Woocommerce
 
-                            $intoVariacionXProductoDates = (array) $intoVariacionXProducto[$hh];
-
-                            $idWoocommer =  $intoVariacionXProductoDates['id'];                         // ID producto variante
-                            $skuWoocommer =  $intoVariacionXProductoDates['sku'];                       // SKU producto variante
-                            $cantidadWoocommer =  $intoVariacionXProductoDates['stock_quantity'];       // STOCK producto variante
-                            $precioWoocommer =  $intoVariacionXProductoDates['regular_price'];          // PRECIO producto variante
-                            // Creando matriz de objetos Arrays
-
-                            $woocommercerArray[] = array($idPadre,$SKUPabre, $idWoocommer, $skuWoocommer,$cantidadWoocommer,$precioWoocommer);  // Matriz contadora
-                            $woocommercerArrayvariant[] = array($idPadre,$idWoocommer,$SKUPabre,$skuWoocommer,$cantidadWoocommer,$precioWoocommer);// Matriz de variantes
-    
-                        }
-
-                        
-                    }
-                    
-                    $tallas[] = $woocommercerArrayvariant;                    // Agregando matrices pendientes
-                    unset($woocommercerArrayvariant);
-                        // Reseteando Matriz
-                }
-
-                $q++;                                                         // Variante de control
-            }
-        }
-
-        // Obtenemos la lista filtrada del stock de S_HTEX DB
-        while ($stockPrimaryDB =mysqli_fetch_array($query1)){              // Vista de productos S_HTEX DB
-
-            // Si algun campo esta vacio rompe el ciclo
-            if(empty($query1)){
-                break;
-            }
-
-            // Filtracion de variables
-            $idPrimaryDB = $stockPrimaryDB['id_inventario'];
-            $skuPrimaryDB = $stockPrimaryDB['referencia'];
-
-            $cantidadT6 = $stockPrimaryDB['talla6'];
-            $cantidadT8 = $stockPrimaryDB['talla8'];
-            $cantidadT10 = $stockPrimaryDB['talla10'];
-            $cantidadT12 = $stockPrimaryDB['talla12'];
-            $cantidadT14 = $stockPrimaryDB['talla14'];
-            $cantidadT16 = $stockPrimaryDB['talla16'];
-            $cantidadT18 = $stockPrimaryDB['talla18'];
-            $cantidadT20 = $stockPrimaryDB['talla20'];
-            $cantidadT26 = $stockPrimaryDB['talla26'];
-            $cantidadT28 = $stockPrimaryDB['talla28'];
-            $cantidadT30 = $stockPrimaryDB['talla30'];
-            $cantidadT32 = $stockPrimaryDB['talla32'];
-            $cantidadT34 = $stockPrimaryDB['talla34'];
-            $cantidadT36 = $stockPrimaryDB['talla36'];
-            $cantidadT38 = $stockPrimaryDB['talla38'];
-            $cantidadTS = $stockPrimaryDB['tallas'];
-            $cantidadTM = $stockPrimaryDB['tallam'];
-            $cantidadTL = $stockPrimaryDB['tallal'];
-            $cantidadTXL = $stockPrimaryDB['tallaxl'];
-            $cantidadTU = $stockPrimaryDB['tallau'];
-            $cantidadTEST = $stockPrimaryDB['tallaest'];
-
-            // Generando matriz de productos
-            $primaryDBArray[] = array("$idPrimaryDB", "$skuPrimaryDB","$cantidadT6","$cantidadT8","$cantidadT10","$cantidadT12","$cantidadT14","$cantidadT16","$cantidadT18","$cantidadT20","$cantidadT26","$cantidadT28","$cantidadT30","$cantidadT32","$cantidadT34","$cantidadT36","$cantidadT38","$cantidadTS","$cantidadTM","$cantidadTL","$cantidadTXL","$cantidadTU","$cantidadTEST");
-
-        }
-
-
-        //print_r($tallas);                                            // Lista datos filtrados Tallas X SKU's' X STOCK X ID's X price Woocommerce
-        //print_r($primaryDBArray);                                    // Tallas de productos variantes S_HTEX DB
-
-        //print_r($listaProductosVariants);                            // Lista Productos Woocommerce
-        //print_r($productosVariant);                                  // Lista de variantes Woocommerce
-        //print_r($woocommercerArray);   Arreglar                              // Contador Tallas X productos Woocommerce
-        //print_r($listaProductosPadreVariant);                        // Vista Todo Woocommerce        
-        //print_r($SKUProductosWoocommerce);                           // Lista de SKU de Woocommerce
-
-        //$rowcount;                                                   // Numero de filas en S_HTEX DB
-        //$cantidadProductos                                           // Numero de filas en Woocommerce
-
-
-        // Cantidad de productos en invenrario Woocommerce
-        $numeroProductosCompleto = count($woocommercerArray);              // Numero completo productos en Woocommerce
-        //echo 'Numero de productos en Woocommerce: ',$numeroProductosCompleto;
-        //echo"<br>";
-        
-        // Iniciando comprobasiones de STOCK
-        $SKU1XSKU2 = 0;
-        $VUELTA = 0;
-        for($i = 0; $i< $rowcount +1; $i++){
-
-
-            if($VUELTA != 0 ){
-
-                if($SKU1XSKU2 == 0){
-                    
-                    if(empty($SKUWoocommerce)){
-                        break;
-                    }
-
-                    echo 'El codigo #: ', $SKUPrimaryDB, ' No existe en Woocommerce';
-                    echo "<br>";
-
-                    $data = [
-                        'name' => 'test',
-                        'type' => 'variable',
-                        'sku' => $SKUPrimaryDB,
-                        'virtual' => true,
-                        'manage_stock' => true,
-                        'stock_quantity' => 7,
-                        'description' => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',
-                        'short_description' => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.',
-                        'categories' => [
-                        ],
-                        'images' => [
-                        ],
-                        'attributes' => [
-                            [
-                                'name' => 'Size',
-                                'position' => 1,
-                                'visible' => true,
-                                'variation' => true,
-                                'options' => [
-                                    'talla10',
-                                    'talla12',
-                                    'talla14',
-                                    'talla16',
-                                    'talla18',
-                                    'talla20',
-                                    'talla26',
-                                    'talla28',
-                                    'talla30',
-                                    'talla32',
-                                    'talla34',
-                                    'talla36',
-                                    'talla38',
-                                    'talla6',
-                                    'talla8',
-                                    'tallaest',
-                                    'tallal',
-                                    'tallam',
-                                    'tallas',
-                                    'tallau',
-                                    'tallaxl'
-                                ]
-                            ]
-                        ],
-                        'default_attributes' => [
-                            [
-                                'name' => 'Size',
-                                'option' => 'S'
-                            ]
-                        ],
-
-                    ];
-
-                    if(empty($datosUpdate = $woocommerce->post('products', $data))){
-
-                        echo 'La referencia no se agrego a Woocommerce';
-                        echo "<br>";
-                        break;
-
-                    }else{
-
-                        echo 'La referencia se agrego a Woocommerrce Procediendo a crear sus variantes';
-                        echo "<br>";
-
-                        $idUpdate = $datosUpdate->id;
-                        $SKUVariante = $datosUpdate->sku.'-'.$idUpdate;
-
-                        $data = [
-                            'sku' => $SKUVariante,
-                            'regular_price' => '9.00',
-                            'image' => [
-                            ],
-                            'attributes' => [
-                                [
-                                    'id' => 9,
-                                    'option' => 'Black'
-                                ]
-                            ]
-                        ];
-                        
-
-                        if(empty( $varianteUpdate = $woocommerce->post('products/'.$idUpdate.'/variations', $data))){
-
-                            echo 'La variacion no se agrego';
-                            echo "<br>";
-                            break;
+                            // Validacion de variable
+                                echo 'Revice su inventario en Woocommerce la referencia #: ',$skuWoocommer,' Presenta
+                                que es un producto simple (que no tiene variaciones de tallas)';
+                                echo "<br>";
+                                echo 'Elimine la referencia de Woocommerce o contactese con el personal para seguir';
+                                echo "<br>";
+                                echo 'ID Woocommerce:---> ',$idWoocommer;
+                                echo "<br>";
+                                echo 'SKU Woocommerce:---> ',$skuWoocommer;
+                            
+                            return;
 
                         }else{
 
+                            // Sustrayendo variables
+                            for($h = 0; $h < $j; $h++){
+                                $j++;                                               // Variable de control
+
+                                // Si ya no hay mas Variantes rompe
+                                if(empty($productosVariant[$h])){
+                                    break;
+                                }
+
+                                // Definiendo datos
+                                $intoVariacionXProducto = (array) $productosVariant[$h]; 
+                                
+                                // SKU producto padre
+                                
+                                $idPadre = $listaProductosVariants['id'];
+                                $SKUPabre = $listaProductosVariants['sku'];
+                                // Agregando matrices pendientes
+                                unset($woocommercerArrayvariant);
+                                
+                                for($hh = 0; $hh < 21; $hh++){
+
+                                    // Si ya no hay mas Variantes rompe
+                                    if(empty($intoVariacionXProducto[$hh])){
+                                        break;
+                                    }
+
+                                    $intoVariacionXProductoDates = (array) $intoVariacionXProducto[$hh];
+
+                                    $idWoocommer =  $intoVariacionXProductoDates['id'];                         // ID producto variante
+                                    $skuWoocommer =  $intoVariacionXProductoDates['sku'];                       // SKU producto variante
+                                    $cantidadWoocommer =  $intoVariacionXProductoDates['stock_quantity'];       // STOCK producto variante
+                                    $precioWoocommer =  $intoVariacionXProductoDates['regular_price'];          // PRECIO producto variante
+                                    // Creando matriz de objetos Arrays
+
+                                    $woocommercerArray[] = array($idPadre,$SKUPabre, $idWoocommer, $skuWoocommer,$cantidadWoocommer,$precioWoocommer);  // Matriz contadora
+                                    $woocommercerArrayvariant[] = array($idPadre,$idWoocommer,$SKUPabre,$skuWoocommer,$cantidadWoocommer,$precioWoocommer);// Matriz de variantes
+            
+                                }
+
+                                
+                            }
                             
-                            echo 'La variacion si se agrego'.$idUpdate.'Procediendo a actualizar la variacion';
+                            $tallas[] = $woocommercerArrayvariant;                    // Agregando matrices pendientes
+                            unset($woocommercerArrayvariant);
+                                // Reseteando Matriz
+                        }
+
+                        $q++;                                                         // Variante de control
+                    }
+                }
+
+            // Obtenemos la lista filtrada del stock de S_HTEX DB
+                while ($stockPrimaryDB =mysqli_fetch_array($query1)){          // Vista de productos S_HTEX DB
+
+                    // Si algun campo esta vacio rompe el ciclo
+                    if(empty($query1)){
+                        break;
+                    }
+
+                    // Filtracion de variables
+                    $idPrimaryDB = $stockPrimaryDB['id_inventario'];
+                    $skuPrimaryDB = $stockPrimaryDB['referencia'];
+
+                    $cantidadT6 = $stockPrimaryDB['talla6'];
+                    $cantidadT8 = $stockPrimaryDB['talla8'];
+                    $cantidadT10 = $stockPrimaryDB['talla10'];
+                    $cantidadT12 = $stockPrimaryDB['talla12'];
+                    $cantidadT14 = $stockPrimaryDB['talla14'];
+                    $cantidadT16 = $stockPrimaryDB['talla16'];
+                    $cantidadT18 = $stockPrimaryDB['talla18'];
+                    $cantidadT20 = $stockPrimaryDB['talla20'];
+                    $cantidadT26 = $stockPrimaryDB['talla26'];
+                    $cantidadT28 = $stockPrimaryDB['talla28'];
+                    $cantidadT30 = $stockPrimaryDB['talla30'];
+                    $cantidadT32 = $stockPrimaryDB['talla32'];
+                    $cantidadT34 = $stockPrimaryDB['talla34'];
+                    $cantidadT36 = $stockPrimaryDB['talla36'];
+                    $cantidadT38 = $stockPrimaryDB['talla38'];
+                    $cantidadTS = $stockPrimaryDB['tallas'];
+                    $cantidadTM = $stockPrimaryDB['tallam'];
+                    $cantidadTL = $stockPrimaryDB['tallal'];
+                    $cantidadTXL = $stockPrimaryDB['tallaxl'];
+                    $cantidadTU = $stockPrimaryDB['tallau'];
+                    $cantidadTEST = $stockPrimaryDB['tallaest'];
+
+                    $siluetaReferencia = $stockPrimaryDB['silueta'];
+                    $precioReferencia = $stockPrimaryDB['precio'];
+
+                    // Generando matriz de productos
+                    $primaryDBArray[] = array("$idPrimaryDB", "$skuPrimaryDB","$cantidadT6","$cantidadT8","$cantidadT10","$cantidadT12","$cantidadT14","$cantidadT16","$cantidadT18","$cantidadT20","$cantidadT26","$cantidadT28","$cantidadT30","$cantidadT32","$cantidadT34","$cantidadT36","$cantidadT38","$cantidadTS","$cantidadTM","$cantidadTL","$cantidadTXL","$cantidadTU","$cantidadTEST","$siluetaReferencia","$precioReferencia");
+
+                }
+            
+            // Control de variables usadas por el sistema  FIXEAR CONTADOR PRODUCTOS WOOCOMMERCE
+                //print_r($tallas);                                            // Lista datos filtrados Tallas X SKU's' X STOCK X ID's X price Woocommerce
+                //print_r($primaryDBArray);                                    // Tallas de productos variantes S_HTEX DB
+                //return;
+
+                //$rowcount;                                                   // Numero de filas en S_HTEX DB
+                //$cantidadProductos                                           // Numero de filas en Woocommerce
+
+                //print_r($listaProductosVariants);                            // Lista Productos Woocommerce
+                //print_r($productosVariant);                                  // Lista de variantes Woocommerce
+                //print_r($woocommercerArray);  FIXEAR!                        // Contador Tallas X productos Woocommerce
+                //print_r($listaProductosPadreVariant);                        // Vista Todo Woocommerce        
+                //print_r($SKUProductosWoocommerce);                           // Lista de SKU de Woocommerce
+
+            // Cantidad de productos en invenrario Woocommerce FEEDBACK ARREGLAR FIXEAR
+                //$numeroProductosCompleto = count($woocommercerArray);              // Numero completo productos en Woocommerce
+                //echo 'Numero de productos en Woocommerce: ',$numeroProductosCompleto;
+                //echo"<br>";
+
+            // Iniciando comprobasiones de STOCK
+
+                $SKU1XSKU2 = 0;
+                $VUELTA = 0;
+                for($i = 0; $i < $rowcount +1; $i++){
+
+                    if($VUELTA != 0 ){
+
+                        if($SKU1XSKU2 == 0){
+                            
+                            if(empty($SKUWoocommerce)){
+                                break;
+                            }
+
+                            echo 'El codigo #: ', $SKUPrimaryDB, ' No existe en Woocommerce';
                             echo "<br>";
 
-                            $IDVarianteUpdate = $varianteUpdate->id;
+                            // Creando datos de productos
+                            if (empty($siluetaName)){
+                                    $siluetaName = 'NULL';
+                            }
 
                             $data = [
-                                'regular_price' => '10.00',
-                                'stock_quantity' => $TALLA6
-                            ];
-                            
-                            if(empty($woocommerce->put('products/'.$idUpdate.'/variations/'.$IDVarianteUpdate, $data))){
+                                    'name' => $siluetaName,
+                                    'type' => 'variable',
+                                    'sku' => $SKUPrimaryDB,
+                                    'regular_price' => $precioReferencia,
+                                    'virtual' => true,
+                                    'manage_stock' => true,
+                                    'stock_quantity' => 7,
+                                    'description' => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',
+                                    'short_description' => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.',
+                                    'categories' => [
+                                    ],
+                                    'images' => [
+                                    ],
+                                    'attributes' => [
+                                        [
+                                            'name' => 'Size',
+                                            'position' => 1,
+                                            'visible' => true,
+                                            'variation' => true,
+                                            'options' => [
+                                                'talla6',
+                                                'talla8',
+                                                'talla10',
+                                                'talla12',
+                                                'talla14',
+                                                'talla16',
+                                                'talla18',
+                                                'talla20',
+                                                'talla26',
+                                                'talla28',
+                                                'talla30',
+                                                'talla32',
+                                                'talla34',
+                                                'talla36',
+                                                'talla38',
+                                                'tallas',
+                                                'tallam',
+                                                'tallal',
+                                                'tallaxl',
+                                                'tallau',
+                                                'tallaest'
+                                            ]
+                                        ]
+                                    ],
 
-                                echo 'La variacion no se actualizo'.$IDVarianteUpdate.'tomo datos por defecto';
+                                ];
+
+                            if(empty($datosUpdate = $woocommerce->post('products', $data))){
+
+                                echo 'La referencia no se agrego a Woocommerce';
                                 echo "<br>";
                                 break;
 
                             }else{
 
-                                echo 'La variacion si se actualizo'.$IDVarianteUpdate.'tomo datos del sistema';
+                                echo 'La referencia se agrego a Woocommerrce Procediendo a crear sus variantes';
                                 echo "<br>";
 
-                                
-                                Header("Location: index.php");
+                                $idUpdate = $datosUpdate->id;
+                                $SKUVariante = $datosUpdate->sku.'-'.$idUpdate;
+
+                                $data = [
+                                    'create' => [
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLA6,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'talla6'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLA8,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'talla8'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLA10,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'talla10'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLA12,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'talla12'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLA14,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'talla14'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLA16,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'talla16'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLA18,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'talla18'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLA20,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'talla20'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLA26,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'talla26'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLA28,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'talla28'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLA30,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'talla30'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLA32,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'talla32'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLA34,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'talla34'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLA36,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'talla36'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLA38,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'talla38'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLAS,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'tallas'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLAM,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'tallam'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLAL,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'tallal'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLAXL,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'tallaxl'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLAU,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'tallau'
+                                                ]
+                                            ]
+                                        ],
+                                        [
+                                            'regular_price' => $precioReferencia,
+                                            'manage_stock' => true,
+                                            'stock_quantity' => $TALLAEST,
+                                            'attributes' => [
+                                                [
+                                                    'id' => 0,
+                                                    'name' => 'Size',
+                                                    'option' => 'tallaest'
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ];
+                                    if(empty( $varianteUpdate = $woocommerce->post('products/'.$idUpdate.'/variations/batch', $data))){
+
+                                        echo 'La variacion no se agrego';
+                                        echo "<br>";
+                                        break;
+
+                                    }else{
+
+                                        echo 'La variacion si se agrego'.$idUpdate;
+                                        echo "<br>";
+
+                                        //
+                                        header("Location: index.php");
+
+                                }
                                 
                             }
-
+                            
                         }
 
                     }
 
-                    break;
-                }
+                    $SKUPrimaryDB = $primaryDBArray[$i][1];    // SKU REFERENCIAS CORRIDAS PrimaryDB
 
-            }
-
-            $SKUPrimaryDB = $primaryDBArray[$i][1];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-
-            $TALLA6 = $primaryDBArray[$i][2];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLA8 = $primaryDBArray[$i][3];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLA10 = $primaryDBArray[$i][4];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLA12 = $primaryDBArray[$i][5];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLA14 = $primaryDBArray[$i][6];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLA16 = $primaryDBArray[$i][7];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLA18 = $primaryDBArray[$i][8];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLA20 = $primaryDBArray[$i][9];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLA26 = $primaryDBArray[$i][10];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLA28 = $primaryDBArray[$i][11];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLA30 = $primaryDBArray[$i][12];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLA32 = $primaryDBArray[$i][13];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLA34 = $primaryDBArray[$i][14];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLA36 = $primaryDBArray[$i][15];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLA38 = $primaryDBArray[$i][16];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLAS = $primaryDBArray[$i][17];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLAM = $primaryDBArray[$i][18];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLAL = $primaryDBArray[$i][19];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLAXL = $primaryDBArray[$i][20];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLAU = $primaryDBArray[$i][21];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-            $TALLAEST = $primaryDBArray[$i][22];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-
-
-            $SKU1XSKU2 = 0;
-            for($ii=0; $ii < $cantidadProductos; $ii++){
-
-                if(empty($tallas[$ii][0][2])){
-                    break;
-                }
-
-                $skuGenerade = (array) $tallas[$ii][0];        // SKU REFERENCIAS CORRIDAS Woocommerce
-                $SKUWoocommerce = $skuGenerade[2];
-
-                if($SKUPrimaryDB === $SKUWoocommerce){
-
-                    $SKU1XSKU2 = 1;
-
-                    break;
-
-                }else{
+                    $TALLA6 = $primaryDBArray[$i][2];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLA8 = $primaryDBArray[$i][3];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLA10 = $primaryDBArray[$i][4];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLA12 = $primaryDBArray[$i][5];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLA14 = $primaryDBArray[$i][6];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLA16 = $primaryDBArray[$i][7];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLA18 = $primaryDBArray[$i][8];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLA20 = $primaryDBArray[$i][9];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLA26 = $primaryDBArray[$i][10];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLA28 = $primaryDBArray[$i][11];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLA30 = $primaryDBArray[$i][12];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLA32 = $primaryDBArray[$i][13];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLA34 = $primaryDBArray[$i][14];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLA36 = $primaryDBArray[$i][15];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLA38 = $primaryDBArray[$i][16];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLAS = $primaryDBArray[$i][17];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLAM = $primaryDBArray[$i][18];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLAL = $primaryDBArray[$i][19];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLAXL = $primaryDBArray[$i][20];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLAU = $primaryDBArray[$i][21];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $TALLAEST = $primaryDBArray[$i][22];    // SKU REFERENCIAS CORRIDAS PrimaryDB
                     
+                    $siluetaName = $primaryDBArray[$i][23];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                    $precioReferencia = $primaryDBArray[$i][24];    // SKU REFERENCIAS CORRIDAS PrimaryDB
 
+                    $SKU1XSKU2 = 0;
+                    for($ii=0; $ii < $cantidadProductos; $ii++){
+
+                        if(empty($tallas[$ii][0][2])){
+                            break;
+                        }
+
+                        $skuGenerade = (array) $tallas[$ii][0];        // SKU REFERENCIAS CORRIDAS Woocommerce
+                        $SKUWoocommerce = $skuGenerade[2];
+
+                        if($SKUPrimaryDB === $SKUWoocommerce){
+
+                            $SKU1XSKU2 = 1;
+
+                            break;
+
+                        }else{
+                            
+
+                        }
+                    }
+                    $VUELTA = 1;
                 }
-            }
-            $VUELTA = 1;
-        }
-
 
 
         }catch ( WC_API_Client_Exception $e ) {
@@ -650,6 +893,8 @@ class APIMetodos{ //Creando clase de metodos
         // Inciando methos GET
         $listaProductosXcantidad = (array) $client->products->get_count();
         $listaProductos = (array) $client->products->get();
+
+
 
         // Numero de productos en la Base de Datos Woocommerce
         $cantidadProductos = $listaProductosXcantidad['count'];
