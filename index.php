@@ -1,14 +1,12 @@
 
 <?php
 //header("Refresh: 300; URL=index.php");
-
 set_time_limit(300000);
-//header("Refresh:12 ; URL='index.php'");
 
 // Cargue de librerias
-require __DIR__ . '/vendor/autoload.php';
-require_once( 'lib/woocommerce-api.php' );
-include("conexion.php");
+    require __DIR__ . '/vendor/autoload.php';
+    require_once( 'lib/woocommerce-api.php' );
+    include("conexion.php");
 
 // Usar los parametros de la API de Woocommerce
 use Automattic\WooCommerce\Client;
@@ -19,13 +17,13 @@ class APIMetodos{ //Creando clase de metodos
     public function getStockToWoocommerceDB(){
 
         // Iniciando variables de autenticacion
-        $options = array(
-            'debug'           => true,
-            'return_as_array' => false,
-            'validate_url'    => false,
-            'timeout'         => 30,
-            'ssl_verify'      => false,
-        );
+            $options = array(
+                'debug'           => true,
+                'return_as_array' => false,
+                'validate_url'    => false,
+                'timeout'         => 30,
+                'ssl_verify'      => false,
+            );
 
         try {
 
@@ -423,390 +421,392 @@ class APIMetodos{ //Creando clase de metodos
 
                 $SKU1XSKU2 = 0;
                 $VUELTA = 0;
+
                 for($i = 0; $i < $rowcount +1; $i++){
 
-                    if($VUELTA != 0 ){
+                    // Creacion de referencias faltantes en Woocommerce
+                        if($VUELTA != 0 ){
 
-                        if($SKU1XSKU2 == 0){
-                            
-                            if(empty($SKUWoocommerce)){
-                                break;
-                            }
+                            if($SKU1XSKU2 == 0){
+                                
+                                if(empty($SKUWoocommerce)){
+                                    break;
+                                }
 
-                            echo 'El codigo #: ', $SKUPrimaryDB, ' No existe en Woocommerce';
-                            echo "<br>";
-
-                            // Creando datos de productos
-                            if (empty($siluetaName)){
-                                    $siluetaName = 'NULL';
-                            }
-
-                            $data = [
-                                    'name' => $siluetaName,
-                                    'type' => 'variable',
-                                    'sku' => $SKUPrimaryDB,
-                                    'regular_price' => $precioReferencia,
-                                    'virtual' => true,
-                                    'manage_stock' => true,
-                                    'stock_quantity' => 7,
-                                    'description' => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',
-                                    'short_description' => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.',
-                                    'categories' => [
-                                    ],
-                                    'images' => [
-                                    ],
-                                    'attributes' => [
-                                        [
-                                            'name' => 'Size',
-                                            'position' => 1,
-                                            'visible' => true,
-                                            'variation' => true,
-                                            'options' => [
-                                                'talla6',
-                                                'talla8',
-                                                'talla10',
-                                                'talla12',
-                                                'talla14',
-                                                'talla16',
-                                                'talla18',
-                                                'talla20',
-                                                'talla26',
-                                                'talla28',
-                                                'talla30',
-                                                'talla32',
-                                                'talla34',
-                                                'talla36',
-                                                'talla38',
-                                                'tallas',
-                                                'tallam',
-                                                'tallal',
-                                                'tallaxl',
-                                                'tallau',
-                                                'tallaest'
-                                            ]
-                                        ]
-                                    ],
-
-                                ];
-
-                            if(empty($datosUpdate = $woocommerce->post('products', $data))){
-
-                                echo 'La referencia no se agrego a Woocommerce';
-                                echo "<br>";
-                                break;
-
-                            }else{
-
-                                echo 'La referencia se agrego a Woocommerrce Procediendo a crear sus variantes';
+                                echo 'El codigo #: ', $SKUPrimaryDB, ' No existe en Woocommerce';
                                 echo "<br>";
 
-                                $idUpdate = $datosUpdate->id;
-                                $SKUVariante = $datosUpdate->sku.'-'.$idUpdate;
+                                // Creando datos de productos
+                                if (empty($siluetaName)){
+                                        $siluetaName = 'NULL';
+                                }
 
                                 $data = [
-                                    'create' => [
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLA6,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'talla6'
+                                        'name' => $siluetaName,
+                                        'type' => 'variable',
+                                        'sku' => $SKUPrimaryDB,
+                                        'regular_price' => $precioReferencia,
+                                        'virtual' => true,
+                                        'manage_stock' => true,
+                                        'stock_quantity' => 7,
+                                        'description' => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',
+                                        'short_description' => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.',
+                                        'categories' => [
+                                        ],
+                                        'images' => [
+                                        ],
+                                        'attributes' => [
+                                            [
+                                                'name' => 'Size',
+                                                'position' => 1,
+                                                'visible' => true,
+                                                'variation' => true,
+                                                'options' => [
+                                                    'talla6',
+                                                    'talla8',
+                                                    'talla10',
+                                                    'talla12',
+                                                    'talla14',
+                                                    'talla16',
+                                                    'talla18',
+                                                    'talla20',
+                                                    'talla26',
+                                                    'talla28',
+                                                    'talla30',
+                                                    'talla32',
+                                                    'talla34',
+                                                    'talla36',
+                                                    'talla38',
+                                                    'tallas',
+                                                    'tallam',
+                                                    'tallal',
+                                                    'tallaxl',
+                                                    'tallau',
+                                                    'tallaest'
                                                 ]
                                             ]
                                         ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLA8,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'talla8'
+
+                                    ];
+
+                                if(empty($datosUpdate = $woocommerce->post('products', $data))){
+
+                                    echo 'La referencia no se agrego a Woocommerce';
+                                    echo "<br>";
+                                    break;
+
+                                }else{
+
+                                    echo 'La referencia se agrego a Woocommerrce Procediendo a crear sus variantes';
+                                    echo "<br>";
+
+                                    $idUpdate = $datosUpdate->id;
+                                    $SKUVariante = $datosUpdate->sku.'-'.$idUpdate;
+
+                                    $data = [
+                                        'create' => [
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLA6,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'talla6'
+                                                    ]
                                                 ]
-                                            ]
-                                        ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLA10,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'talla10'
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLA8,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'talla8'
+                                                    ]
                                                 ]
-                                            ]
-                                        ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLA12,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'talla12'
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLA10,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'talla10'
+                                                    ]
                                                 ]
-                                            ]
-                                        ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLA14,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'talla14'
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLA12,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'talla12'
+                                                    ]
                                                 ]
-                                            ]
-                                        ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLA16,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'talla16'
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLA14,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'talla14'
+                                                    ]
                                                 ]
-                                            ]
-                                        ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLA18,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'talla18'
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLA16,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'talla16'
+                                                    ]
                                                 ]
-                                            ]
-                                        ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLA20,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'talla20'
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLA18,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'talla18'
+                                                    ]
                                                 ]
-                                            ]
-                                        ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLA26,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'talla26'
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLA20,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'talla20'
+                                                    ]
                                                 ]
-                                            ]
-                                        ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLA28,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'talla28'
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLA26,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'talla26'
+                                                    ]
                                                 ]
-                                            ]
-                                        ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLA30,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'talla30'
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLA28,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'talla28'
+                                                    ]
                                                 ]
-                                            ]
-                                        ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLA32,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'talla32'
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLA30,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'talla30'
+                                                    ]
                                                 ]
-                                            ]
-                                        ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLA34,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'talla34'
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLA32,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'talla32'
+                                                    ]
                                                 ]
-                                            ]
-                                        ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLA36,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'talla36'
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLA34,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'talla34'
+                                                    ]
                                                 ]
-                                            ]
-                                        ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLA38,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'talla38'
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLA36,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'talla36'
+                                                    ]
                                                 ]
-                                            ]
-                                        ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLAS,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'tallas'
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLA38,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'talla38'
+                                                    ]
                                                 ]
-                                            ]
-                                        ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLAM,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'tallam'
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLAS,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'tallas'
+                                                    ]
                                                 ]
-                                            ]
-                                        ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLAL,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'tallal'
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLAM,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'tallam'
+                                                    ]
                                                 ]
-                                            ]
-                                        ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLAXL,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'tallaxl'
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLAL,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'tallal'
+                                                    ]
                                                 ]
-                                            ]
-                                        ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLAU,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'tallau'
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLAXL,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'tallaxl'
+                                                    ]
                                                 ]
-                                            ]
-                                        ],
-                                        [
-                                            'regular_price' => $precioReferencia,
-                                            'manage_stock' => true,
-                                            'stock_quantity' => $TALLAEST,
-                                            'attributes' => [
-                                                [
-                                                    'id' => 0,
-                                                    'name' => 'Size',
-                                                    'option' => 'tallaest'
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLAU,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'tallau'
+                                                    ]
+                                                ]
+                                            ],
+                                            [
+                                                'regular_price' => $precioReferencia,
+                                                'manage_stock' => true,
+                                                'stock_quantity' => $TALLAEST,
+                                                'attributes' => [
+                                                    [
+                                                        'id' => 0,
+                                                        'name' => 'Size',
+                                                        'option' => 'tallaest'
+                                                    ]
                                                 ]
                                             ]
                                         ]
-                                    ]
-                                ];
-                                    if(empty( $varianteUpdate = $woocommerce->post('products/'.$idUpdate.'/variations/batch', $data))){
+                                    ];
+                                        if(empty( $varianteUpdate = $woocommerce->post('products/'.$idUpdate.'/variations/batch', $data))){
 
-                                        echo 'La variacion no se agrego';
-                                        echo "<br>";
-                                        break;
+                                            echo 'La variacion no se agrego';
+                                            echo "<br>";
+                                            break;
 
-                                    }else{
+                                        }else{
 
-                                        echo 'La variacion si se agrego'.$idUpdate;
-                                        echo "<br>";
+                                            echo 'La variacion si se agrego'.$idUpdate;
+                                            echo "<br>";
 
-                                        //
-                                        header("Location: index.php");
+                                            //
+                                            header("Location: index.php");
 
+                                    }
+                                    
                                 }
                                 
                             }
-                            
+
                         }
+                    // Obteniendo datos
+                        $SKUPrimaryDB = $primaryDBArray[$i][1];    // SKU REFERENCIAS CORRIDAS PrimaryDB
 
-                    }
-
-                    $SKUPrimaryDB = $primaryDBArray[$i][1];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-
-                    $TALLA6 = $primaryDBArray[$i][2];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLA8 = $primaryDBArray[$i][3];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLA10 = $primaryDBArray[$i][4];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLA12 = $primaryDBArray[$i][5];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLA14 = $primaryDBArray[$i][6];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLA16 = $primaryDBArray[$i][7];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLA18 = $primaryDBArray[$i][8];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLA20 = $primaryDBArray[$i][9];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLA26 = $primaryDBArray[$i][10];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLA28 = $primaryDBArray[$i][11];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLA30 = $primaryDBArray[$i][12];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLA32 = $primaryDBArray[$i][13];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLA34 = $primaryDBArray[$i][14];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLA36 = $primaryDBArray[$i][15];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLA38 = $primaryDBArray[$i][16];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLAS = $primaryDBArray[$i][17];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLAM = $primaryDBArray[$i][18];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLAL = $primaryDBArray[$i][19];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLAXL = $primaryDBArray[$i][20];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLAU = $primaryDBArray[$i][21];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $TALLAEST = $primaryDBArray[$i][22];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    
-                    $siluetaName = $primaryDBArray[$i][23];    // SKU REFERENCIAS CORRIDAS PrimaryDB
-                    $precioReferencia = $primaryDBArray[$i][24];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLA6 = $primaryDBArray[$i][2];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLA8 = $primaryDBArray[$i][3];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLA10 = $primaryDBArray[$i][4];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLA12 = $primaryDBArray[$i][5];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLA14 = $primaryDBArray[$i][6];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLA16 = $primaryDBArray[$i][7];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLA18 = $primaryDBArray[$i][8];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLA20 = $primaryDBArray[$i][9];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLA26 = $primaryDBArray[$i][10];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLA28 = $primaryDBArray[$i][11];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLA30 = $primaryDBArray[$i][12];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLA32 = $primaryDBArray[$i][13];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLA34 = $primaryDBArray[$i][14];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLA36 = $primaryDBArray[$i][15];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLA38 = $primaryDBArray[$i][16];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLAS = $primaryDBArray[$i][17];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLAM = $primaryDBArray[$i][18];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLAL = $primaryDBArray[$i][19];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLAXL = $primaryDBArray[$i][20];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLAU = $primaryDBArray[$i][21];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $TALLAEST = $primaryDBArray[$i][22];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        
+                        $siluetaName = $primaryDBArray[$i][23];    // SKU REFERENCIAS CORRIDAS PrimaryDB
+                        $precioReferencia = $primaryDBArray[$i][24];    // SKU REFERENCIAS CORRIDAS PrimaryDB
 
                     $SKU1XSKU2 = 0;
                     for($ii=0; $ii < $cantidadProductos; $ii++){
@@ -816,16 +816,19 @@ class APIMetodos{ //Creando clase de metodos
                         }
 
                         $skuGenerade = (array) $tallas[$ii][0];        // SKU REFERENCIAS CORRIDAS Woocommerce
-                        $SKUWoocommerce = $skuGenerade[2];
+                        $SKUWoocommerce = $skuGenerade[2];             // Variables principal filtrada
 
-                        if($SKUPrimaryDB === $SKUWoocommerce){
+                        if($SKUPrimaryDB === $SKUWoocommerce){         // Comprobacion de referencias 
 
-                            $SKU1XSKU2 = 1;
+                            $SKU1XSKU2 = 1;                            // Controlador de referencias encontradas
+
+                                // INTEGRAR METODO DE ACTUALIZACION 
 
                             break;
 
                         }else{
-                            
+
+                            // validacion de datos
 
                         }
                     }
