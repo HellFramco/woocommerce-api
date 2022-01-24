@@ -139,14 +139,14 @@ class APIMetodos{ //Creando clase de metodos
         }
     }
     // Funcion para eliminar productos de la base de datos de Woocommerce
-    public function deleteStockToWoocommerceDB(){
+    public function getDuplicatesSKUInSHTEXDB(){
 
         // Iniciando variables de autenticacion
         $options = array(
             'debug'           => true,
             'return_as_array' => false,
             'validate_url'    => false,
-            'timeout'         => 30,
+            'timeout'         => 0,
             'ssl_verify'      => false,
         );
 
@@ -167,18 +167,32 @@ class APIMetodos{ //Creando clase de metodos
                 'version' => 'wc/v3',
             ]);
 
-            
-            $data = [
-                'attributes' => [
-                    [
-                        'id' => 0,
-                        'name' => 'Size',
-                        'option' => 'talla8'
-                    ]
-                ]
-            ];
+            // Accediendo Base de datos S-HTEX
+            $con=conectar();
 
-            print_r($woocommerce->put('products/4671/variations/4673', $data));
+            // Importando datos de S-HTEX DB
+            $sql1 = "SELECT id_inventario, referencia, color, ROW_NUMBER() OVER( PARTITION BY referencia ORDER BY referencia  ) AS rn FROM inventarios_productos";
+            $query1 =mysqli_query($con,$sql1);
+
+            while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+                
+                if($stockPrimaryDB[3] > 1){
+
+
+                    $SKUVariantColor = $stockPrimaryDB[1].$stockPrimaryDB[2];
+                    $IDTales = $stockPrimaryDB[0];
+
+                    $sql2 = "UPDATE inventarios_productos SET referencia='$SKUVariantColor' WHERE id_inventario='$IDTales'";
+                    $query2 =mysqli_query($con,$sql2);
+
+                    if($query2){
+                        echo "K pro hd";
+                    }else{
+                        echo "k noob";
+                    }
+
+                }
+            }
 
         }catch ( WC_API_Client_Exception $e ) {
 
@@ -192,7 +206,6 @@ class APIMetodos{ //Creando clase de metodos
             }
         }
     }
-    
     // Funcion para actualizar productos a la base de datos de Woocommerce
     public function updateStockToWoocommerceDB(){
 
@@ -201,7 +214,7 @@ class APIMetodos{ //Creando clase de metodos
                 'debug'           => true,
                 'return_as_array' => false,
                 'validate_url'    => false,
-                'timeout'         => 30,
+                'timeout'         => 0,
                 'ssl_verify'      => false,
             );
 
@@ -446,8 +459,8 @@ class APIMetodos{ //Creando clase de metodos
                                         'sku' => $SKUPrimaryDB,
                                         'regular_price' => $precioReferencia,
                                         'virtual' => true,
-                                        'manage_stock' => false,
-                                        'stock_quantity' => 7,
+                                        'manage_stock' => true,
+                                        'stock_quantity' => 1,
                                         'description' => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',
                                         'short_description' => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.',
                                         'categories' => [
@@ -838,6 +851,9 @@ class APIMetodos{ //Creando clase de metodos
 
                         if($SKUPrimaryDB === $SKUWoocommerce){         // Comprobacion de referencias 
 
+                            echo 'Referencia #: '.$SKUPrimaryDB.' Encontrada procediendo a actualizar sus variables!';
+                            echo "<br>";
+
                             $SKU1XSKU2 = 1;                            // Controlador de referencias encontradas
 
                                 // INTEGRAR METODO DE ACTUALIZACION 
@@ -974,7 +990,17 @@ class APIMetodos{ //Creando clase de metodos
                                     ]
                                 ];
 
-                                print_r($woocommerce->post('products/'.$IdPWoocommerce.'/variations/batch', $data));
+                                if($woocommerce->post('products/'.$IdPWoocommerce.'/variations/batch', $data)){
+
+                                    echo 'Las variables se actualizaron corectamente';
+                                    echo "<br>";
+
+                                }else{
+
+                                    
+                                    echo 'Hay un problema al actualizar esta referencia #: '.$SKUPrimaryDB.' Ubiquela y corrijala manualmente';
+                                    echo "<br>";
+                                };
 
                             break;
 
@@ -1000,7 +1026,6 @@ class APIMetodos{ //Creando clase de metodos
         }
         }
     }
-    
     // funcion para actualizar primaryDB X STOCk Woocommerce
     public function updateStockToPrimaryDB(){
 
@@ -1009,7 +1034,7 @@ class APIMetodos{ //Creando clase de metodos
         'debug'           => true,
         'return_as_array' => false,
         'validate_url'    => false,
-        'timeout'         => 30,
+        'timeout'         => 0,
         'ssl_verify'      => false,
         );
 
@@ -1343,7 +1368,7 @@ class APIMetodos{ //Creando clase de metodos
 
 // Instanciando Funciones 
 $a = new APIMetodos();
-$a->updateStockToWoocommerceDB();
+$a->getDuplicatesSKUInSHTEXDB();
 
 
 ?>
