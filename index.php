@@ -1,7 +1,7 @@
 
 <?php
-//header("Refresh: 300; URL=index.php");
-set_time_limit(300000);
+//header("Refresh: 300000; URL=index.php");
+set_time_limit(0);
 
 // Cargue de librerias
     require __DIR__ . '/vendor/autoload.php';
@@ -192,17 +192,18 @@ class APIMetodos{ //Creando clase de metodos
             }
         }
     }
+    
     // Funcion para actualizar productos a la base de datos de Woocommerce
     public function updateStockToWoocommerceDB(){
 
         // Iniciando variables de autenticacion
-        $options = array(
-            'debug'           => true,
-            'return_as_array' => false,
-            'validate_url'    => false,
-            'timeout'         => 30,
-            'ssl_verify'      => false,
-        );
+            $options = array(
+                'debug'           => true,
+                'return_as_array' => false,
+                'validate_url'    => false,
+                'timeout'         => 30,
+                'ssl_verify'      => false,
+            );
 
         try {
             // Accediendo API Woocommerce
@@ -222,7 +223,7 @@ class APIMetodos{ //Creando clase de metodos
 
             // Accediendo Base de datos S-HTEX
                 $con=conectar();
-
+            
             // Inciando methos GET
                 $listaProductosXcantidad = (array) $client->products->get_count();
                 $listaProductos = (array) $client->products->get();
@@ -233,11 +234,11 @@ class APIMetodos{ //Creando clase de metodos
                 $headers = (array) $response['headers'];                          // Headers de los Metadatos
                 $paginas =  $headers['x-wc-totalpages'];                           // Numero de paginas X productos Woocommerce
                 $paginas = (int)$paginas;                                         // Variable numeros de paginas Principal
-
+            
             // Importando datos de S-HTEX DB
-                $sql1 = "SELECT *  FROM inventarios_productos";
+                $sql1 = "SELECT * FROM inventarios_productos GROUP BY referencia HAVING COUNT(*)=1";
                 $query1 =mysqli_query($con,$sql1);
-
+            
             // Numero Referencias del stock de S-HTEX DB
                 if ($result=mysqli_query($con,$sql1)) {
 
@@ -246,12 +247,12 @@ class APIMetodos{ //Creando clase de metodos
                     echo 'Numero de productos en SHTEX: ', $rowcount; 
                     echo"<br>";
                 }
-
+            
             // Numero Referencias en Woocommerce
                 $cantidadProductos = $listaProductosXcantidad['count'];
                 echo 'Numero de referencias de Woocomerce: ',$cantidadProductos;
                 echo"<br>";
-
+                
             // Obtenemos la lista filtrada del STOCk de Woocommerce
                 for ($i = 1; $i <= $paginas; $i++) {                              // Vista de productos X paginas
 
@@ -355,6 +356,7 @@ class APIMetodos{ //Creando clase de metodos
                         $q++;                                                         // Variante de control
                     }
                 }
+                
 
             // Obtenemos la lista filtrada del stock de S_HTEX DB
                 while ($stockPrimaryDB =mysqli_fetch_array($query1)){          // Vista de productos S_HTEX DB
@@ -422,16 +424,13 @@ class APIMetodos{ //Creando clase de metodos
                 $SKU1XSKU2 = 0;
                 $VUELTA = 0;
 
+
                 for($i = 0; $i < $rowcount +1; $i++){
 
                     // Creacion de referencias faltantes en Woocommerce
                         if($VUELTA != 0 ){
 
                             if($SKU1XSKU2 == 0){
-                                
-                                if(empty($SKUWoocommerce)){
-                                    break;
-                                }
 
                                 echo 'El codigo #: ', $SKUPrimaryDB, ' No existe en Woocommerce';
                                 echo "<br>";
@@ -447,7 +446,7 @@ class APIMetodos{ //Creando clase de metodos
                                         'sku' => $SKUPrimaryDB,
                                         'regular_price' => $precioReferencia,
                                         'virtual' => true,
-                                        'manage_stock' => true,
+                                        'manage_stock' => false,
                                         'stock_quantity' => 7,
                                         'description' => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',
                                         'short_description' => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.',
@@ -506,6 +505,7 @@ class APIMetodos{ //Creando clase de metodos
                                     $data = [
                                         'create' => [
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLA6',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLA6,
@@ -518,6 +518,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLA8',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLA8,
@@ -530,6 +531,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLA10',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLA10,
@@ -542,6 +544,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLA12',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLA12,
@@ -554,6 +557,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLA14',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLA14,
@@ -566,6 +570,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLA16',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLA16,
@@ -578,6 +583,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLA18',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLA18,
@@ -590,6 +596,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLA20',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLA20,
@@ -602,6 +609,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLA26',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLA26,
@@ -614,6 +622,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLA28',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLA28,
@@ -626,6 +635,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLA30',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLA30,
@@ -638,6 +648,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLA32',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLA32,
@@ -650,6 +661,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLA34',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLA34,
@@ -662,6 +674,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLA36',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLA36,
@@ -674,6 +687,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLA38',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLA38,
@@ -686,6 +700,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLAS',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLAS,
@@ -698,6 +713,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLAM',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLAM,
@@ -710,6 +726,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLAL',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLAL,
@@ -722,6 +739,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLAXL',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLAXL,
@@ -734,6 +752,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLAU',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLAU,
@@ -746,6 +765,7 @@ class APIMetodos{ //Creando clase de metodos
                                                 ]
                                             ],
                                             [
+                                                'sku' => $SKUPrimaryDB.'TALLAEST',
                                                 'regular_price' => $precioReferencia,
                                                 'manage_stock' => true,
                                                 'stock_quantity' => $TALLAEST,
@@ -771,7 +791,7 @@ class APIMetodos{ //Creando clase de metodos
                                             echo "<br>";
 
                                             //
-                                            header("Location: index.php");
+                                            //header("Location: index.php");
 
                                     }
                                     
@@ -809,13 +829,11 @@ class APIMetodos{ //Creando clase de metodos
                         $precioReferencia = $primaryDBArray[$i][24];    // SKU REFERENCIAS CORRIDAS PrimaryDB
 
                     $SKU1XSKU2 = 0;
-                    for($ii=0; $ii < $cantidadProductos; $ii++){
 
-                        if(empty($tallas[$ii][0][2])){
-                            break;
-                        }
+                    for($ii=0; $ii < $cantidadProductos + 1; $ii++){
 
-                        $skuGenerade = (array) $tallas[$ii][0];        // SKU REFERENCIAS CORRIDAS Woocommerce
+                        $skuGenerade = (array) $tallas[$ii][0]; 
+                        $IdPWoocommerce = $skuGenerade[0];              // SKU REFERENCIAS CORRIDAS Woocommerce
                         $SKUWoocommerce = $skuGenerade[2];             // Variables principal filtrada
 
                         if($SKUPrimaryDB === $SKUWoocommerce){         // Comprobacion de referencias 
@@ -823,6 +841,140 @@ class APIMetodos{ //Creando clase de metodos
                             $SKU1XSKU2 = 1;                            // Controlador de referencias encontradas
 
                                 // INTEGRAR METODO DE ACTUALIZACION 
+
+                                $skuGenerade = (array) $tallas[$ii][0];
+                                $IDWoocommerceTalla6 = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][1];
+                                $IDWoocommerceTalla8 = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][2];
+                                $IDWoocommerceTalla10 = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][3];
+                                $IDWoocommerceTalla12 = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][4];
+                                $IDWoocommerceTalla14 = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][5];
+                                $IDWoocommerceTalla16 = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][6];
+                                $IDWoocommerceTalla18 = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][7];
+                                $IDWoocommerceTalla20 = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][8];
+                                $IDWoocommerceTalla26 = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][9];
+                                $IDWoocommerceTalla28 = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][10];
+                                $IDWoocommerceTalla30 = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][11];
+                                $IDWoocommerceTalla32 = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][12];
+                                $IDWoocommerceTalla34 = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][13];
+                                $IDWoocommerceTalla36 = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][14];
+                                $IDWoocommerceTalla38 = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][15];
+                                $IDWoocommerceTallaS = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][16];
+                                $IDWoocommerceTallaM = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][17];
+                                $IDWoocommerceTallaL = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][18];
+                                $IDWoocommerceTallaXL = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][19];
+                                $IDWoocommerceTallaU = $skuGenerade[1]; 
+                                $skuGenerade = (array) $tallas[$ii][20];
+                                $IDWoocommerceTallaEST = $skuGenerade[1]; 
+
+                                $data = [
+                                    'update' => [
+                                        [
+                                            'id' => $IDWoocommerceTalla6,
+                                            'stock_quantity' => $TALLA6,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTalla8,
+                                            'stock_quantity' => $TALLA8,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTalla10,
+                                            'stock_quantity' => $TALLA10,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTalla12,
+                                            'stock_quantity' => $TALLA12,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTalla14,
+                                            'stock_quantity' => $TALLA14,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTalla16,
+                                            'stock_quantity' => $TALLA16,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTalla18,
+                                            'stock_quantity' => $TALLA18,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTalla20,
+                                            'stock_quantity' => $TALLA20,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTalla26,
+                                            'stock_quantity' => $TALLA26,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTalla28,
+                                            'stock_quantity' => $TALLA28,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTalla30,
+                                            'stock_quantity' => $TALLA30,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTalla32,
+                                            'stock_quantity' => $TALLA32,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTalla34,
+                                            'stock_quantity' => $TALLA34,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTalla36,
+                                            'stock_quantity' => $TALLA36,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTalla38,
+                                            'stock_quantity' => $TALLA38,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTallaS,
+                                            'stock_quantity' => $TALLAS,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTallaM,
+                                            'stock_quantity' => $TALLAM,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTallaL,
+                                            'stock_quantity' => $TALLAL,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTallaXL,
+                                            'stock_quantity' => $TALLAXL,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTallaU,
+                                            'stock_quantity' => $TALLAU,
+                                        ],
+                                        [
+                                            'id' => $IDWoocommerceTallaEST,
+                                            'stock_quantity' => $TALLAEST,
+                                        ]
+                                    ]
+                                ];
+
+                                print_r($woocommerce->post('products/'.$IdPWoocommerce.'/variations/batch', $data));
 
                             break;
 
@@ -838,16 +990,17 @@ class APIMetodos{ //Creando clase de metodos
 
         }catch ( WC_API_Client_Exception $e ) {
 
-        echo $e->getMessage() . PHP_EOL;
-        echo $e->getCode() . PHP_EOL;
+            echo $e->getMessage() . PHP_EOL;
+            echo $e->getCode() . PHP_EOL;
         
-        if ( $e instanceof WC_API_Client_HTTP_Exception ) {
+            if ( $e instanceof WC_API_Client_HTTP_Exception ) {
         
             print_r( $e->get_request() );
             print_r( $e->get_response() );
         }
         }
     }
+    
     // funcion para actualizar primaryDB X STOCk Woocommerce
     public function updateStockToPrimaryDB(){
 
@@ -887,7 +1040,7 @@ class APIMetodos{ //Creando clase de metodos
         // Contando las filas del stock de S-HTEX DB
         if ($result=mysqli_query($con,$sql1)) {
 
-            // Numero de filas de S-HTEXDB
+        // Numero de filas de S-HTEXDB
             $rowcount=mysqli_num_rows($result);
             echo 'Numero de referencias en SHTEX: ', $rowcount; 
             echo"<br>";
@@ -1088,27 +1241,27 @@ class APIMetodos{ //Creando clase de metodos
                 // Obteniendo datos
                 $skuPadreW = $tallasVariantes[0][0];                         // SKU Padre de los productos variantes Woocommerce
 
-                $stockTalla10 = $tallasVariantes[0][3];                      // STOCK Talla 10 Woocommerce
-                $stockTalla12 = $tallasVariantes[1][3];                      // STOCK Talla 12 Woocommerce
-                $stockTalla14 = $tallasVariantes[2][3];                      // STOCK Talla 14 Woocommerce
-                $stockTalla16 = $tallasVariantes[3][3];                      // STOCK Talla 16 Woocommerce
-                $stockTalla18 = $tallasVariantes[4][3];                      // STOCK Talla 18 Woocommerce
-                $stockTalla20 = $tallasVariantes[5][3];                      // STOCK Talla 20 Woocommerce
-                $stockTalla26 = $tallasVariantes[6][3];                      // STOCK Talla 26 Woocommerce
-                $stockTalla28 = $tallasVariantes[7][3];                      // STOCK Talla 28 Woocommerce
-                $stockTalla30 = $tallasVariantes[8][3];                      // STOCK Talla 30 Woocommerce
-                $stockTalla32 = $tallasVariantes[9][3];                      // STOCK Talla 32 Woocommerce
-                $stockTalla34 = $tallasVariantes[10][3];                     // STOCK Talla 34 Woocommerce
-                $stockTalla36 = $tallasVariantes[11][3];                     // STOCK Talla 36 Woocommerce
-                $stockTalla38 = $tallasVariantes[12][3];                     // STOCK Talla 38 Woocommerce
-                $stockTalla6 = $tallasVariantes[13][3];                      // STOCK Talla 6 Woocommerce
-                $stockTalla8 = $tallasVariantes[14][3];                      // STOCK Talla 8 Woocommerce
-                $stockTallaEST = $tallasVariantes[15][3];                    // STOCK Talla EST Woocommerce
-                $stockTallaL = $tallasVariantes[16][3];                      // STOCK Talla L Woocommerce
-                $stockTallaM = $tallasVariantes[17][3];                      // STOCK Talla M Woocommerce
-                $stockTallaS = $tallasVariantes[18][3];                      // STOCK Talla S Woocommerce
+                $stockTalla6 = $tallasVariantes[0][3];                      // STOCK Talla 10 Woocommerce
+                $stockTalla8 = $tallasVariantes[1][3];                      // STOCK Talla 12 Woocommerce
+                $stockTalla10 = $tallasVariantes[2][3];                      // STOCK Talla 14 Woocommerce
+                $stockTalla12 = $tallasVariantes[3][3];                      // STOCK Talla 16 Woocommerce
+                $stockTalla14 = $tallasVariantes[4][3];                      // STOCK Talla 18 Woocommerce
+                $stockTalla16 = $tallasVariantes[5][3];                      // STOCK Talla 20 Woocommerce
+                $stockTalla18 = $tallasVariantes[6][3];                      // STOCK Talla 26 Woocommerce
+                $stockTalla20 = $tallasVariantes[7][3];                      // STOCK Talla 28 Woocommerce
+                $stockTalla26 = $tallasVariantes[8][3];                      // STOCK Talla 30 Woocommerce
+                $stockTalla28 = $tallasVariantes[9][3];                      // STOCK Talla 32 Woocommerce
+                $stockTalla30 = $tallasVariantes[10][3];                     // STOCK Talla 34 Woocommerce
+                $stockTalla32 = $tallasVariantes[11][3];                     // STOCK Talla 36 Woocommerce
+                $stockTalla34 = $tallasVariantes[12][3];                     // STOCK Talla 38 Woocommerce
+                $stockTalla36 = $tallasVariantes[13][3];                      // STOCK Talla 6 Woocommerce
+                $stockTalla38 = $tallasVariantes[14][3];                      // STOCK Talla 8 Woocommerce
+                $stockTallaS = $tallasVariantes[15][3];                    // STOCK Talla EST Woocommerce
+                $stockTallaM = $tallasVariantes[16][3];                      // STOCK Talla L Woocommerce
+                $stockTallaL = $tallasVariantes[17][3];                      // STOCK Talla M Woocommerce
+                $stockTallaXL = $tallasVariantes[18][3];                      // STOCK Talla S Woocommerce
                 $stockTallaU = $tallasVariantes[19][3];                      // STOCK Talla U Woocommerce
-                $stockTallaXL = $tallasVariantes[20][3];                     // STOCK Talla XL Woocommerce
+                $stockTallaEST = $tallasVariantes[20][3];                     // STOCK Talla XL Woocommerce
 
                 $referenciaHallada = 0;                               // Verifica si la referencia n a sido hallada
                 $listaRecorrida = 0;                                  // verifica si la lista de productos de S_HTEX a sido completada
@@ -1191,5 +1344,6 @@ class APIMetodos{ //Creando clase de metodos
 // Instanciando Funciones 
 $a = new APIMetodos();
 $a->updateStockToWoocommerceDB();
+
 
 ?>
