@@ -30,14 +30,14 @@ class APIMetodos{ //Creando clase de metodos
             // Autenticando 
             $client = new WC_API_Client(
             'https://www.drabbalovers.co/',
-            'ck_3e6abf70b8566f628bd50ffc70dd38779caefb00',
-            'cs_2a4c74eb3f5ee2e70f57a47d540c9d28c3f19c70',
+            'ck_7f574edb1041d0e71eadd69bb5092ee5c25dc5ca',
+            'cs_90e26e975b984c87d39cf31dbd3b913584be0557',
             $options );
 
             $woocommerce = new Client(
             'https://www.drabbalovers.co/', 
-            'ck_3e6abf70b8566f628bd50ffc70dd38779caefb00', 
-            'cs_2a4c74eb3f5ee2e70f57a47d540c9d28c3f19c70',
+            'ck_7f574edb1041d0e71eadd69bb5092ee5c25dc5ca', 
+            'cs_90e26e975b984c87d39cf31dbd3b913584be0557',
             [
                 'version' => 'wc/v3',
             ]);
@@ -103,28 +103,32 @@ class APIMetodos{ //Creando clase de metodos
             'debug'           => true,
             'return_as_array' => false,
             'validate_url'    => false,
-            'timeout'         => 30,
+            'timeout'         => 0,
             'ssl_verify'      => false,
         );
 
         try {
 
-            // Autenticando 
+        // Accediendo API Woocommerce
             $client = new WC_API_Client(
-            'https://www.drabbalovers.co/',
-            'ck_3e6abf70b8566f628bd50ffc70dd38779caefb00',
-            'cs_2a4c74eb3f5ee2e70f57a47d540c9d28c3f19c70',
-            $options );
-
+                'https://www.drabbalovers.co/',
+                'ck_7f574edb1041d0e71eadd69bb5092ee5c25dc5ca',
+                'cs_90e26e975b984c87d39cf31dbd3b913584be0557',
+                $options );
+            
             $woocommerce = new Client(
             'https://www.drabbalovers.co/', 
-            'ck_3e6abf70b8566f628bd50ffc70dd38779caefb00', 
-            'cs_2a4c74eb3f5ee2e70f57a47d540c9d28c3f19c70',
+            'ck_7f574edb1041d0e71eadd69bb5092ee5c25dc5ca', 
+            'cs_90e26e975b984c87d39cf31dbd3b913584be0557',
             [
-                'version' => 'wc/v3',
+            'version' => 'wc/v3',
             ]);
+            
+        // Accediendo Base de datos S-HTEX
+            $con=conectar();
 
-            $client->products->create( array( 'title' => 'Test Product','sku' => '00010', 'type' => 'simple', 'regular_price' => '9.99', 'description' => 'test' ) );
+        
+                        
 
         }catch ( WC_API_Client_Exception $e ) {
 
@@ -138,7 +142,7 @@ class APIMetodos{ //Creando clase de metodos
             }
         }
     }
-    // Funcion para eliminar productos de la base de datos de Woocommerce
+    // Funcion para Refactorizar las referencias repetidas de S-HTEX DB
     public function getDuplicatesSKUInSHTEXDB(){
 
         // Iniciando variables de autenticacion
@@ -171,28 +175,37 @@ class APIMetodos{ //Creando clase de metodos
             $con=conectar();
 
             // Importando datos de S-HTEX DB
-            $sql1 = "SELECT id_inventario, referencia, color, ROW_NUMBER() OVER( PARTITION BY referencia ORDER BY referencia  ) AS rn FROM inventarios_productos";
+            $sql1 = "SELECT id_inventario, referencia, reprogramacion, tipo, estado, ROW_NUMBER() OVER( PARTITION BY referencia ORDER BY referencia  ) AS rn FROM inventarios_productos";
             $query1 =mysqli_query($con,$sql1);
-
+            $e = 0;
             while ($stockPrimaryDB =mysqli_fetch_array($query1)){
-                
-                if($stockPrimaryDB[3] > 1){
 
+                if($stockPrimaryDB[4] == 'PROCESO' ){ // Condicion para refactorizar
 
-                    $SKUVariantColor = $stockPrimaryDB[1].$stockPrimaryDB[2];
-                    $IDTales = $stockPrimaryDB[0];
+                    print_r($stockPrimaryDB);
+                    echo "<br>";
+                    /*
+                    $NewSKU = $stockPrimaryDB[1].'-'.$stockPrimaryDB[2].'-'.$stockPrimaryDB[5];
 
-                    $sql2 = "UPDATE inventarios_productos SET referencia='$SKUVariantColor' WHERE id_inventario='$IDTales'";
-                    $query2 =mysqli_query($con,$sql2);
-
-                    if($query2){
-                        echo "K pro hd";
+                    $sql="UPDATE inventarios_productos SET referencia='$NewSKU' WHERE id_inventario='$stockPrimaryDB[0]'";
+                    $query=mysqli_query($con,$sql);
+    
+                    if($query){
+                        echo "Referencia #: ".$stockPrimaryDB[1].' Cambio a ---> '.$NewSKU;
+                        echo "<br>";
                     }else{
-                        echo "k noob";
+                        echo "Referencia #: ".$stockPrimaryDB[1].' Cambio no';
+                        echo "<br>";
                     }
-
+                    */
+                    
                 }
+
+                
+
             }
+
+            print_r($e);
 
         }catch ( WC_API_Client_Exception $e ) {
 
@@ -222,14 +235,14 @@ class APIMetodos{ //Creando clase de metodos
             // Accediendo API Woocommerce
                 $client = new WC_API_Client(
                 'https://www.drabbalovers.co/',
-                'ck_3e6abf70b8566f628bd50ffc70dd38779caefb00',
-                'cs_2a4c74eb3f5ee2e70f57a47d540c9d28c3f19c70',
+                'ck_7f574edb1041d0e71eadd69bb5092ee5c25dc5ca',
+                'cs_90e26e975b984c87d39cf31dbd3b913584be0557',
                 $options );
 
                 $woocommerce = new Client(
                 'https://www.drabbalovers.co/', 
-                'ck_3e6abf70b8566f628bd50ffc70dd38779caefb00', 
-                'cs_2a4c74eb3f5ee2e70f57a47d540c9d28c3f19c70',
+                'ck_7f574edb1041d0e71eadd69bb5092ee5c25dc5ca', 
+                'cs_90e26e975b984c87d39cf31dbd3b913584be0557',
                 [
                     'version' => 'wc/v3',
                 ]);
