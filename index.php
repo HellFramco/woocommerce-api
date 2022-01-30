@@ -96,7 +96,7 @@ class APIMetodos{ //Creando clase de metodos
         }
     }
     // Funcion para crear o exportar productos de la base de datos de Woocommerce
-    public function exportStockToWoocommerceDB(){
+    public function getOrdersFromWoocommerce(){
 
          // Iniciando variables de autenticacion
         $options = array(
@@ -117,16 +117,128 @@ class APIMetodos{ //Creando clase de metodos
                 $options );
             
             $woocommerce = new Client(
-            'https://www.drabbalovers.co/', 
-            'ck_7f574edb1041d0e71eadd69bb5092ee5c25dc5ca', 
-            'cs_90e26e975b984c87d39cf31dbd3b913584be0557',
+                'https://www.drabbalovers.co/', 
+                'ck_7f574edb1041d0e71eadd69bb5092ee5c25dc5ca', 
+                'cs_90e26e975b984c87d39cf31dbd3b913584be0557',
             [
-            'version' => 'wc/v3',
+                'version' => 'wc/v3',
             ]);
-            
-        // Accediendo Base de datos S-HTEX
-            $con=conectar();
 
+            
+            // Accediendo Base de datos S-HTEX
+            $con=conectar();
+            
+            $pedidosWoocommerce = (array) $woocommerce->get('orders');
+
+            $sql1 = "SELECT * FROM pedidos_woocommerce ";
+            $query1 =mysqli_query($con,$sql1);
+
+            // Numero Referencias del stock de S-HTEX DB
+            if ($result=mysqli_query($con,$sql1)) {
+
+                // Numero de filas de S-HTEXDB
+                $rowcount=mysqli_num_rows($result);
+                echo 'Numero de productos en SHTEX: ', $rowcount; 
+                echo"<br>";
+            
+            }
+
+            $j = 1;
+
+            for ($i = 0; $i < $j; $i++){
+                $j++;
+                
+                if(empty($pedidosWoocommerce[$i])){
+                    break;
+                }
+
+                $idPedidoWoocommerce = $pedidosWoocommerce[$i]->id;
+                $statusPedidoWoocommerce = $pedidosWoocommerce[$i]->status;
+                $numeroPedidoWoocommerce = $pedidosWoocommerce[$i]->number;
+                $referencias = $pedidosWoocommerce[$i]->line_items;
+                $jj = 1;
+
+                for ($ii = 0; $ii < $jj; $ii++){
+
+                    
+
+                    if(empty($referencias[$ii])){
+                        break;
+                    }
+
+                    $idProductoWoocommerce = $referencias[$ii]->product_id;
+                    $idVariacion = $referencias[$ii]->variation_id;
+                    $cantidadVendida = $cantidadVendida.'-'.$referencias[$ii]->quantity;
+                    $talla = $talla.'-'.$referencias[$ii]->meta_data[0]->value;
+                    $cantidadReferencias = $jj;
+
+                    $jj++;
+
+                }
+
+                if($rowcount == 0){
+                    
+                    if($statusPedidoWoocommerce == 'completed'){
+                        
+                        $sqli="INSERT INTO pedidos_woocommerce (id, id_woocommerce, estado, numero_pedido, referencias_pedido, id_woocommerce_producto, id_variacion_talla,cantidad, talla) VALUES (NULL, '$idPedidoWoocommerce', '$statusPedidoWoocommerce', '$numeroPedidoWoocommerce', '$cantidadReferencias', '$idProductoWoocommerce', '$idVariacion', '$cantidadVendida', '$talla');";
+                        $queryi= mysqli_query($con,$sqli);
+
+                        if($queryi){
+
+                            echo"El pedido se ha actualizado en la base de datos";
+                                
+                        }else {
+                            echo"noob";
+                        }
+                    }
+
+                }else{
+                    
+                    if($statusPedidoWoocommerce == 'completed'){
+
+                        while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                            $numeroPedidoDB = $stockPrimaryDB[3];
+
+                            print_r($stockPrimaryDB);
+                            echo"<br>";
+
+                            
+                            if($numeroPedidoWoocommerce != $numeroPedidoDB){
+
+                                
+                                $sqli="INSERT INTO pedidos_woocommerce (id, id_woocommerce, estado, numero_pedido, referencias_pedido, id_woocommerce_producto, id_variacion_talla,cantidad, talla) VALUES (NULL, '$idPedidoWoocommerce', '$statusPedidoWoocommerce', '$numeroPedidoWoocommerce', '$cantidadReferencias', '$idProductoWoocommerce', '$idVariacion', '$cantidadVendida', '$talla');";
+                                $queryi= mysqli_query($con,$sqli);
+
+                                if($queryi){
+
+                                    echo"El pedido se ha actualizado en la base de datos";
+                                        
+                                }else {
+                                    echo"noob";
+                                    echo"<br>";
+                                }
+
+                                break;
+
+                            }else{
+
+                                echo 'el pedido ya existe';
+                                echo"<br>";
+
+                            }
+                            
+
+                        }
+
+                    }
+
+                }
+                
+                unset($cantidadVendida);
+                unset($talla);
+
+            }
         
                         
 
@@ -1381,7 +1493,7 @@ class APIMetodos{ //Creando clase de metodos
 
 // Instanciando Funciones 
 $a = new APIMetodos();
-$a->getDuplicatesSKUInSHTEXDB();
+$a->updateStockToWoocommerceDB();
 
 
 ?>
