@@ -130,7 +130,7 @@ class APIMetodos{ //Creando clase de metodos
             
             $pedidosWoocommerce = (array) $woocommerce->get('orders');
 
-            $sql1 = "SELECT * FROM pedidos_woocommerce ";
+            $sql1 = "SELECT * FROM pedidos_tienda";
             $query1 =mysqli_query($con,$sql1);
 
             // Numero Referencias del stock de S-HTEX DB
@@ -140,107 +140,49 @@ class APIMetodos{ //Creando clase de metodos
                 $rowcount=mysqli_num_rows($result);
                 echo 'Numero de productos en SHTEX: ', $rowcount; 
                 echo"<br>";
+
+                
+                // Si algun campo esta vacio rompe el ciclo
+                if($rowcount == 0){
+                    echo 'sadsd';
+                    $primaryDBArray[] =NULL;
+                }
             
             }
+            // Lista pedidos Woocommerce
+            while ($stockPrimaryDB =mysqli_fetch_array($query1)){          // Vista de productos S_HTEX DB
 
-            $j = 1;
+                // Filtracion de variables
+                $idPedidoDB = $stockPrimaryDB['id_pedido'];
+                $numeroPedidoDB = $stockPrimaryDB['numero_venta_w'];
+                $cuponPedido = $stockPrimaryDB['cupon'];
+                $nombreInfluenser = $stockPrimaryDB['nombre_influencer'];
+                $fechaPedido = $stockPrimaryDB['fecha_hora'];
+                $nombreCliente = $stockPrimaryDB['nombre_cliente'];
+                $documentoCliente = $stockPrimaryDB['documento_cliente'];
+                $direccionCliente = $stockPrimaryDB['direccion_cliente'];
+                $totalPedido = $stockPrimaryDB['total_venta'];
 
-            for ($i = 0; $i < $j; $i++){
-                $j++;
-                
-                if(empty($pedidosWoocommerce[$i])){
-                    break;
-                }
-
-                $idPedidoWoocommerce = $pedidosWoocommerce[$i]->id;
-                $statusPedidoWoocommerce = $pedidosWoocommerce[$i]->status;
-                $numeroPedidoWoocommerce = $pedidosWoocommerce[$i]->number;
-                $referencias = $pedidosWoocommerce[$i]->line_items;
-                $jj = 1;
-
-                for ($ii = 0; $ii < $jj; $ii++){
-
-                    
-
-                    if(empty($referencias[$ii])){
-                        break;
-                    }
-
-                    $idProductoWoocommerce = $referencias[$ii]->product_id;
-                    $idVariacion = $referencias[$ii]->variation_id;
-                    $cantidadVendida = $cantidadVendida.'-'.$referencias[$ii]->quantity;
-                    $talla = $talla.'-'.$referencias[$ii]->meta_data[0]->value;
-                    $cantidadReferencias = $jj;
-
-                    $jj++;
-
-                }
-
-                if($rowcount == 0){
-                    
-                    if($statusPedidoWoocommerce == 'completed'){
-                        
-                        $sqli="INSERT INTO pedidos_woocommerce (id, id_woocommerce, estado, numero_pedido, referencias_pedido, id_woocommerce_producto, id_variacion_talla,cantidad, talla) VALUES (NULL, '$idPedidoWoocommerce', '$statusPedidoWoocommerce', '$numeroPedidoWoocommerce', '$cantidadReferencias', '$idProductoWoocommerce', '$idVariacion', '$cantidadVendida', '$talla');";
-                        $queryi= mysqli_query($con,$sqli);
-
-                        if($queryi){
-
-                            echo"El pedido se ha actualizado en la base de datos";
-                                
-                        }else {
-                            echo"noob";
-                        }
-                    }
-
-                }else{
-                    
-                    if($statusPedidoWoocommerce == 'completed'){
-
-                        while ($stockPrimaryDB =mysqli_fetch_array($query1)){
-
-                            $numeroPedidoDB = $stockPrimaryDB[3];
-
-                            print_r($stockPrimaryDB);
-                            echo"<br>";
-
-                            
-                            if($numeroPedidoWoocommerce != $numeroPedidoDB){
-
-                                
-                                $sqli="INSERT INTO pedidos_woocommerce (id, id_woocommerce, estado, numero_pedido, referencias_pedido, id_woocommerce_producto, id_variacion_talla,cantidad, talla) VALUES (NULL, '$idPedidoWoocommerce', '$statusPedidoWoocommerce', '$numeroPedidoWoocommerce', '$cantidadReferencias', '$idProductoWoocommerce', '$idVariacion', '$cantidadVendida', '$talla');";
-                                $queryi= mysqli_query($con,$sqli);
-
-                                if($queryi){
-
-                                    echo"El pedido se ha actualizado en la base de datos";
-                                        
-                                }else {
-                                    echo"noob";
-                                    echo"<br>";
-                                }
-
-                                break;
-
-                            }else{
-
-                                echo 'el pedido ya existe';
-                                echo"<br>";
-
-                            }
-                            
-
-                        }
-
-                    }
-
-                }
-                
-                unset($cantidadVendida);
-                unset($talla);
+                // Generando matriz de productos
+                $primaryDBArray[] = array("$idPedidoDB", "$numeroPedidoDB","$cuponPedido","$nombreInfluenser","$fechaPedido","$nombreCliente","$documentoCliente","$direccionCliente","$totalPedido");
 
             }
-        
-                        
+
+            //print_r($pedidosWoocommerce);
+
+            $j = 1;
+            //Lista pedidos HTEX
+            for($i = 0; $i < $j; $i++){
+
+                $q = 0;
+                $objPaginas = ['page' => $i];                                 // Numero de paginas disponibles
+                $lista = (array) $woocommerce->get('products',$objPaginas);   // Lista completa STOCK Woocommerce
+
+                
+
+                
+
+            }
 
         }catch ( WC_API_Client_Exception $e ) {
 
@@ -1493,7 +1435,6 @@ class APIMetodos{ //Creando clase de metodos
 
 // Instanciando Funciones 
 $a = new APIMetodos();
-$a->updateStockToWoocommerceDB();
-
+$a->getOrdersFromWoocommerce();
 
 ?>
