@@ -530,7 +530,7 @@ class APIMetodos{ //Creando clase de metodos
                     $cantidadTU = $stockPrimaryDB['tallau'];
                     $cantidadTEST = $stockPrimaryDB['tallaest'];
 
-                    $siluetaReferencia = $stockPrimaryDB['silueta'];
+                    $siluetaReferencia = $stockPrimaryDB['descripcion'];
                     $precioReferencia = $stockPrimaryDB['precio'];
 
                     // Generando matriz de productos

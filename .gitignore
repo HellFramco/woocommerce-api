@@ -2,3 +2,6 @@
 /DB/
 ejemplo.php
 conexion.php
+
+composer.json
+composer.lock
