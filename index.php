@@ -46,7 +46,7 @@ class APIMetodos{ //Creando clase de metodos
                 $con=conectar();
 
             // Importando datos de S-HTEX DB
-                $sql1 = "SELECT * FROM inventarios_productos WHERE silueta = 'CARGO' AND marca = 'DRABBA' AND tipo = 'JEANS'";
+                $sql1 = "SELECT * FROM inventarios_productos WHERE silueta = 'BERMUDA CABALLERO' AND marca = 'HYH' AND tipo = 'JEANS'";
                 $query1 =mysqli_query($con,$sql1);
                 
                 while ($stockPrimaryDB =mysqli_fetch_array($query1)){
@@ -56,8 +56,8 @@ class APIMetodos{ //Creando clase de metodos
                     print_r($stockPrimaryDB['referencia']);
                     echo "<br>";
 
-                    $NewPrice = '70000';
-                    $NewPriceMajor = '45000';
+                    $NewPrice = '55000';
+                    $NewPriceMajor = '43000';
 
                     $sql="UPDATE inventarios_productos SET precio ='$NewPrice', precio_mayor = '$NewPriceMajor' WHERE id_inventario='$stockPrimaryDB[0]'";
                     $query=mysqli_query($con,$sql);
@@ -292,7 +292,7 @@ class APIMetodos{ //Creando clase de metodos
                                         $query=mysqli_query($con,$sql);
                         
                                         if($query){
-                                            echo 'HECHO';
+                                            echo 'La cantidad se ah actualizado';
                                             echo "<br>";
                                         }else{
                                             echo 'NO';
@@ -303,44 +303,504 @@ class APIMetodos{ //Creando clase de metodos
 
                                     break;
                                 case 'talla8':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['talla8'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET talla8 = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                                 case 'talla10':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['talla10'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET talla10 = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                                 case 'talla12':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['talla12'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET talla12 = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                                 case 'talla14':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['talla14'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET talla14 = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                                 case 'talla16':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['talla16'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET talla16 = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                                 case 'talla18':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['talla18'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET talla18 = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                                 case 'talla20':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['talla20'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET talla20 = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                                 case 'talla26':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['talla26'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET talla26 = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                                 case 'talla28':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['talla28'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET talla2 = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                                 case 'talla30':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['talla30'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET talla30 = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                                 case 'talla32':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['talla32'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET talla32 = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                                 case 'talla34':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['talla34'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET talla34 = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                                 case 'talla36':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['talla36'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET talla36 = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                                 case 'talla38':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['talla38'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET talla38 = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                                 case 'tallas':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['tallas'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET tallas = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                                 case 'tallam':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['tallam'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET tallam = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                                 case 'tallal':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['tallal'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET tallal = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                                 case 'tallaxl':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['tallaxl'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET tallaxl = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                                 case 'tallau':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['tallau'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET tallau = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                                 case 'tallaest':
+
+                                    $sql1 = "SELECT * FROM inventarios_productos WHERE referencia = '$SKURPW'";
+                                    $query1 =mysqli_query($con,$sql1);
+
+                                    while ($stockPrimaryDB =mysqli_fetch_array($query1)){
+
+                                        $stockPDB = $stockPrimaryDB['tallaest'];
+                                        $newStock = $stockPDB - $cantidadRPW;
+
+                                        
+                                        $sql="UPDATE inventarios_productos SET tallaest = '$newStock' WHERE referencia ='$SKURPW'";
+                                        $query=mysqli_query($con,$sql);
+                        
+                                        if($query){
+                                            echo 'La cantidad se ah actualizado';
+                                            echo "<br>";
+                                        }else{
+                                            echo 'NO';
+                                            echo "<br>";
+                                        }
+
+                                    }
+
                                     break;
                             }
 
@@ -1659,6 +2119,6 @@ class APIMetodos{ //Creando clase de metodos
 
 // Instanciando Funciones 
 $a = new APIMetodos();
-$a->getOrdersFromWoocommerce();
+$a->updateStockToWoocommerceDB();
 
 ?>
