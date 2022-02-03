@@ -250,7 +250,7 @@ class APIMetodos{ //Creando clase de metodos
 
                     if($vuletaCheck == 1){
                         
-                        $sqli="INSERT INTO pedidos_tienda (id_pedido, numero_venta_w, cupon, nombre_influencer, fecha_hora, nombre_cliente, documento_cliente,direccion_cliente, total_venta, estado) VALUES (NULL, '$numeroPW', '$cuponW', '$nombreInfluenserW', '$fechaPedidoW', '$nombreClienteW', '$documentoClienteW', '$direccionClienteW', '$totalPedidoW', 'Pendiente por despachar');";
+                        $sqli="INSERT INTO pedidos_tienda (id_pedido, numero_venta_w, cupon, nombre_influencer, fecha_hora, nombre_cliente, documento_cliente,direccion_cliente, total_venta, estado) VALUES (NULL, '$numeroPW', '$cuponW', '$nombreInfluenserW', '$fechaPedidoW', '$nombreClienteW', '$documentoClienteW', '$direccionClienteW', '$totalPedidoW', 'Pendiente');";
                         $queryi= mysqli_query($con,$sqli);
 
                         if($queryi){
@@ -270,13 +270,6 @@ class APIMetodos{ //Creando clase de metodos
                             $tallaRPW = $referenciasPW[$iii][2];
                             $cantidadRPW = $referenciasPW[$iii][1];
 
-                            print_r($SKURPW);
-                            echo "<br>";
-                            print_r($tallaRPW);
-                            echo "<br>";
-                            print_r($cantidadRPW);
-                            echo "<br>";
-
                             $sqli="INSERT INTO lista_productos_tienda (id_lista, numero_venta_w, referencia, talla, cantidad) VALUES (NULL, '$numeroPW', '$SKURPW', '$tallaRPW', '$cantidadRPW');";
                             $queryi= mysqli_query($con,$sqli);
 
@@ -288,6 +281,8 @@ class APIMetodos{ //Creando clase de metodos
                             }else {
 
                             }
+
+
 
 
                             $r++;
@@ -311,9 +306,6 @@ class APIMetodos{ //Creando clase de metodos
                 $totalPedidoW = $listaPedidosWoocommerce[$p][7];
                 $referenciasPW = $listaPedidosWoocommerce[$p][8];
                 $vuletaCheck = 0;
-
-                
-                print_r($referenciasPW);
 
                 for($pp = 0; $pp < $ww; $pp++){
 
