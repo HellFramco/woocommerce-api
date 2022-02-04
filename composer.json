@@ -1,24 +1,11 @@
 {
-    "name": "hellframco/woocommerce-api",
-    "description": "WooCommerce REST API",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "HellFramco",
-            "email": "manuelbarrios7891238520@gmail.com"
-        },
-        {
-            "name": "woocommerce-api"
-        }
-    ],
+    "name": "manu/woocommerce-api",
     "autoload": {
-        "classmap": ["lib/woocommerce-api"]
+        "psr-4": {
+            "Manu\\WoocommerceApi\\": "src/"
+        }
     },
-    "minimum-stability": "stable",
     "require": {
-        "php": ">= 5.2.0",
-        "ext-curl": "*",
-        "ext-json": "*",
         "automattic/woocommerce": "^3.0"
     }
 }
