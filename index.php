@@ -45,20 +45,22 @@ class APIMetodos{ //Creando clase de metodos
                 $con=conectar();
 
             // Importando datos de S-HTEX DB
-                $sql1 = "SELECT * FROM inventarios_productos WHERE silueta = 'BERMUDA CABALLERO' AND marca = 'HYH' AND tipo = 'JEANS'";
+                $sql1 = "SELECT * FROM `inventarios_productos` WHERE marca = 'DENIMDRY' OR marca = 'Denim Dry' OR marca = 'DENIM DRY' OR marca = 'DENIM DRY'";
                 $query1 =mysqli_query($con,$sql1);
                 
                 while ($stockPrimaryDB =mysqli_fetch_array($query1)){
                         
-                    print_r($stockPrimaryDB['silueta']);
-                    echo "<br>";
-                    print_r($stockPrimaryDB['referencia']);
-                    echo "<br>";
+                    //print_r($stockPrimaryDB);
+                    //echo "<br>";
+                    //print_r($stockPrimaryDB['referencia']);
+                    //echo "<br>";
 
-                    $NewPrice = '55000';
-                    $NewPriceMajor = '43000';
+                    //$NewPrice = '55000';
+                    //$NewPriceMajor = '43000';
 
-                    $sql="UPDATE inventarios_productos SET precio ='$NewPrice', precio_mayor = '$NewPriceMajor' WHERE id_inventario='$stockPrimaryDB[0]'";
+                    
+
+                    $sql="UPDATE inventarios_productos SET marca ='DENIM DRY' WHERE id_inventario='$stockPrimaryDB[0]'";
                     $query=mysqli_query($con,$sql);
     
                     if($query){
@@ -69,7 +71,7 @@ class APIMetodos{ //Creando clase de metodos
                         echo "<br>";
                     }
 
-                        
+                    
 
                 }
 
@@ -1653,86 +1655,107 @@ class APIMetodos{ //Creando clase de metodos
                                         [
                                             'id' => $IDWoocommerceTalla6,
                                             'stock_quantity' => $TALLA6,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTalla8,
                                             'stock_quantity' => $TALLA8,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTalla10,
                                             'stock_quantity' => $TALLA10,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTalla12,
                                             'stock_quantity' => $TALLA12,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTalla14,
                                             'stock_quantity' => $TALLA14,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTalla16,
                                             'stock_quantity' => $TALLA16,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTalla18,
                                             'stock_quantity' => $TALLA18,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTalla20,
                                             'stock_quantity' => $TALLA20,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTalla26,
                                             'stock_quantity' => $TALLA26,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTalla28,
                                             'stock_quantity' => $TALLA28,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTalla30,
                                             'stock_quantity' => $TALLA30,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTalla32,
                                             'stock_quantity' => $TALLA32,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTalla34,
                                             'stock_quantity' => $TALLA34,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTalla36,
                                             'stock_quantity' => $TALLA36,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTalla38,
                                             'stock_quantity' => $TALLA38,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTallaS,
                                             'stock_quantity' => $TALLAS,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTallaM,
                                             'stock_quantity' => $TALLAM,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTallaL,
                                             'stock_quantity' => $TALLAL,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTallaXL,
                                             'stock_quantity' => $TALLAXL,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTallaU,
                                             'stock_quantity' => $TALLAU,
+                                            'regular_price' => $precioReferencia,
                                         ],
                                         [
                                             'id' => $IDWoocommerceTallaEST,
                                             'stock_quantity' => $TALLAEST,
+                                            'regular_price' => $precioReferencia,
                                         ]
                                     ]
                                 ];
@@ -2115,6 +2138,6 @@ class APIMetodos{ //Creando clase de metodos
 
 // Instanciando Funciones 
 $a = new APIMetodos();
-$a->getOrdersFromWoocommerce();
+$a->getPriceToFixing();
 
 ?>
