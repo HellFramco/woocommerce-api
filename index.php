@@ -1,4 +1,3 @@
-
 <?php
 //header("Refresh: 300000; URL=index.php");
 set_time_limit(0);
@@ -850,9 +849,6 @@ class APIMetodos{ //Creando clase de metodos
                 $vuletaCheck = 1;
                 $w++;
             }
-
-
-
 
         }catch ( WC_API_Client_Exception $e ) {
 
