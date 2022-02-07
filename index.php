@@ -2119,6 +2119,6 @@ class APIMetodos{ //Creando clase de metodos
 
 // Instanciando Funciones 
 $a = new APIMetodos();
-$a->updateStockToWoocommerceDB();
+$a->getOrdersFromWoocommerce();
 
 ?>
