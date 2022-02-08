@@ -50,15 +50,15 @@ class APIMetodos{ //Creando clase de metodos
                 
                 while ($stockPrimaryDB =mysqli_fetch_array($query1)){
                         
-                    //print_r($stockPrimaryDB);
-                    //echo "<br>";
+                    print_r($stockPrimaryDB);
+                    echo "<br>";
                     //print_r($stockPrimaryDB['referencia']);
                     //echo "<br>";
 
                     //$NewPrice = '55000';
                     //$NewPriceMajor = '43000';
 
-                    
+                    /*
 
                     $sql="UPDATE inventarios_productos SET marca ='DENIM DRY' WHERE id_inventario='$stockPrimaryDB[0]'";
                     $query=mysqli_query($con,$sql);
@@ -71,7 +71,7 @@ class APIMetodos{ //Creando clase de metodos
                         echo "<br>";
                     }
 
-                    
+                    */
 
                 }
 
