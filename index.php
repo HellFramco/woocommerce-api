@@ -897,18 +897,22 @@ class APIMetodos{ //Creando clase de metodos
             $con=conectar();
 
             // Importando datos de S-HTEX DB
-            $sql1 = "SELECT id_inventario, referencia, reprogramacion, tipo, estado, ROW_NUMBER() OVER( PARTITION BY referencia ORDER BY referencia  ) AS rn FROM inventarios_productos";
+            //$sql1 = "SELECT id_inventario, referencia, reprogramacion, tipo, estado, ROW_NUMBER() OVER( PARTITION BY referencia ORDER BY referencia  ) AS rn FROM inventarios_productos";
+            $sql1 = "SELECT * FROM inventarios_productos";
             $query1 =mysqli_query($con,$sql1);
             $e = 0;
             while ($stockPrimaryDB =mysqli_fetch_array($query1)){
 
-                if($stockPrimaryDB[4] == 'PROCESO' ){ // Condicion para refactorizar
 
-                    print_r($stockPrimaryDB);
-                    echo "<br>";
-                    /*
-                    $NewSKU = $stockPrimaryDB[1].'-'.$stockPrimaryDB[2].'-'.$stockPrimaryDB[5];
+                //print_r($stockPrimaryDB);
+                //echo "<br>";
+                    
+                $NewSKU = $stockPrimaryDB[1].'-'.$stockPrimaryDB[0];
 
+                //print_r($NewSKU);
+                //echo "<br>";
+
+                
                     $sql="UPDATE inventarios_productos SET referencia='$NewSKU' WHERE id_inventario='$stockPrimaryDB[0]'";
                     $query=mysqli_query($con,$sql);
     
@@ -919,9 +923,8 @@ class APIMetodos{ //Creando clase de metodos
                         echo "Referencia #: ".$stockPrimaryDB[1].' Cambio no';
                         echo "<br>";
                     }
-                    */
+                
                     
-                }
 
             }
 
@@ -2138,6 +2141,6 @@ class APIMetodos{ //Creando clase de metodos
 
 // Instanciando Funciones 
 $a = new APIMetodos();
-$a->getPriceToFixing();
+$a->updateStockToWoocommerceDB();
 
 ?>
