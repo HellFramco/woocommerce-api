@@ -904,7 +904,7 @@ class APIMetodos{ //Creando clase de metodos
             $e = 0;
             while ($stockPrimaryDB =mysqli_fetch_array($query1)){
 
-                if($stockPrimaryDB[4] == 'PROCESO' ){ // Condicion para refactorizar
+                if($stockPrimaryDB[5] >= 2 ){ // Condicion para refactorizar
 
                     print_r($stockPrimaryDB);
                     echo "<br>";
@@ -955,14 +955,14 @@ class APIMetodos{ //Creando clase de metodos
             // Accediendo API Woocommerce
                 $client = new WC_API_Client(
                 'https://www.drabbalovers.co/',
-                'ck_7f574edb1041d0e71eadd69bb5092ee5c25dc5ca',
-                'cs_90e26e975b984c87d39cf31dbd3b913584be0557',
+                'ck_a000f6b39fb3342eecb1206bc42278bb0932813d',
+                'cs_c8efae8a209729abc1118f9729811325747d9738',
                 $options );
 
                 $woocommerce = new Client(
                 'https://www.drabbalovers.co/', 
-                'ck_7f574edb1041d0e71eadd69bb5092ee5c25dc5ca', 
-                'cs_90e26e975b984c87d39cf31dbd3b913584be0557',
+                'ck_a000f6b39fb3342eecb1206bc42278bb0932813d', 
+                'cs_c8efae8a209729abc1118f9729811325747d9738',
                 [
                     'version' => 'wc/v3',
                 ]);
@@ -1192,6 +1192,7 @@ class APIMetodos{ //Creando clase de metodos
                                         'sku' => $SKUPrimaryDB,
                                         'regular_price' => $precioReferencia,
                                         'virtual' => true,
+                                        //'manage_stock' => true,
                                         'description' => '',
                                         'short_description' => '',
                                         'categories' => [
