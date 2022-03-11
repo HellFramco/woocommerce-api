@@ -904,11 +904,16 @@ class APIMetodos{ //Creando clase de metodos
             $e = 0;
             while ($stockPrimaryDB =mysqli_fetch_array($query1)){
 
+                $referencia = $stockPrimaryDB[1];
+                $porciones = explode("-",$referencia);
+                print_r($porciones[0]);
+                echo "<br>";
+
                 if($stockPrimaryDB[5] >= 2 ){ // Condicion para refactorizar
 
-                    print_r($stockPrimaryDB);
-                    echo "<br>";
+
                     /*
+                    
                     $NewSKU = $stockPrimaryDB[1].'-'.$stockPrimaryDB[2].'-'.$stockPrimaryDB[5];
 
                     $sql="UPDATE inventarios_productos SET referencia='$NewSKU' WHERE id_inventario='$stockPrimaryDB[0]'";
@@ -2120,6 +2125,6 @@ class APIMetodos{ //Creando clase de metodos
 
 // Instanciando Funciones 
 $a = new APIMetodos();
-$a->updateStockToWoocommerceDB();
+$a->getDuplicatesSKUInSHTEXDB();
 
 ?>
